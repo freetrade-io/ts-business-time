@@ -1,0 +1,9 @@
+parser: typescript
+printWidth: 80
+tabWidth: 4
+useTabs: false
+semi: false
+trailingComma: all
+bracketSpacing: true
+arrowParens: always
+
