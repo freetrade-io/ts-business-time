@@ -1,4 +1,4 @@
-import {Big, BigSource} from "big.js"
+import moment = require("moment")
 import {
     DurationInputArg1,
     DurationInputArg2,
@@ -9,7 +9,6 @@ import {
 import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
 import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
 import {WeekDays} from "./constraint/WeekDays"
-import moment = require("moment")
 
 export class BusinessTime {
     private readonly moment: moment.Moment
@@ -48,32 +47,31 @@ export class BusinessTime {
         return this.addBusinessDays(1)
     }
 
-    addBusinessDays(businessDays: BigSource): BusinessTime {
-        let businessDaysToAdd = new Big(businessDays)
-        if (businessDaysToAdd.lt(0)) {
-            return this.subBusinessDays(businessDaysToAdd.abs())
+    addBusinessDays(businessDaysToAdd: number): BusinessTime {
+        if (businessDaysToAdd === 0) {
+            return this.clone()
+        }
+
+        if (businessDaysToAdd < 0) {
+            return this.subBusinessDays(Math.abs(businessDaysToAdd))
         }
 
         // Jump ahead in whole days first, because the business days to add
         // will be at least this much. This solves the "intuitive problem" that
         // Monday 09:00 + 1 business day could technically be Monday 17:00, but
         // intuitively should be Tuesday 09:00.
-        const daysToJump: Big = businessDaysToAdd.round(0, 0)
+        const daysToJump: number = Math.floor(businessDaysToAdd)
         let next: BusinessTime = this.add(daysToJump, "days")
 
         // We need to check how much business time we actually covered by
         // skipping ahead in days.
-        businessDaysToAdd = businessDaysToAdd.sub(
-            this.diffInPartialBusinessDays(next.getMoment()),
-        )
+        businessDaysToAdd -= this.diffInPartialBusinessDays(next.getMoment())
 
-        const decrement: Big = new Big(this.precision.asDays()).div(
-            this.lengthOfBusinessDay().asDays(),
-        )
+        const decrement: number = this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
-        while (businessDaysToAdd.gt(0)) {
+        while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
-                businessDaysToAdd = businessDaysToAdd.sub(decrement)
+                businessDaysToAdd -= decrement
             }
             next = next.add(this.precision)
         }
@@ -85,49 +83,49 @@ export class BusinessTime {
         return this.subBusinessDays(1)
     }
 
-    subBusinessDays(businessDays: BigSource): BusinessTime {
-        let businessDaysToSub = new Big(businessDays)
-        if (businessDaysToSub.lt(0)) {
-            return this.addBusinessDays(businessDaysToSub.abs())
+    subBusinessDays(businessDaysToSub: number): BusinessTime {
+        if (businessDaysToSub === 0) {
+            return this.clone()
+        }
+
+        if (businessDaysToSub < 0) {
+            return this.addBusinessDays(Math.abs(businessDaysToSub))
         }
 
         // Jump back in whole days first, because the business days to subtract
         // will be at least this much. This also solves the "intuitive
         // problem" that Tuesday 17:00 - 1 business day could technically be
         // Tuesday 09:00, but intuitively should be Monday 17:00.
-        const daysToJump: Big = businessDaysToSub.round(0, 0)
+        const daysToJump: number = Math.floor(businessDaysToSub)
         let prev: BusinessTime = this.subtract(daysToJump, "days")
 
         // We need to check how much business time we actually covered by
         // skipping back in days.
-        businessDaysToSub = businessDaysToSub.sub(
-            this.diffInPartialBusinessDays(prev.getMoment()),
-        )
+        businessDaysToSub -= this.diffInPartialBusinessDays(prev.getMoment())
 
-        const decrement: Big = new Big(this.precision.asDays()).div(
-            this.lengthOfBusinessDay().asDays(),
-        )
+        const decrement: number = this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
-        while (businessDaysToSub.gt(0)) {
+        while (businessDaysToSub > 0) {
             prev = prev.subtract(this.precision)
             if (prev.isBusinessTime()) {
-                businessDaysToSub = businessDaysToSub.sub(decrement)
+                businessDaysToSub -= decrement
             }
         }
 
         return prev
     }
 
-    diffInBusinessDays(time?: moment.Moment, absolute: boolean = true): Big {
-        return this.diffInPartialBusinessDays(time, absolute).round(0, 0)
+    diffInBusinessDays(time?: moment.Moment, absolute: boolean = true): number {
+        return Math.floor(this.diffInPartialBusinessDays(time, absolute))
     }
 
     diffInPartialBusinessDays(
         time?: moment.Moment,
         absolute: boolean = true,
-    ): Big {
-        return this.diffInBusinessTime(time, absolute)
-            .div(this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds())
+    ): number {
+        return this.diffInBusinessTime(time, absolute) / (
+            this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds()
+        )
     }
 
     /**
@@ -137,39 +135,39 @@ export class BusinessTime {
      * precision. Finer precision means more steps but a potentially more
      * accurate result.
      */
-    diffInBusinessTime(time?: moment.Moment, absolute: boolean = true): Big {
+    diffInBusinessTime(time?: moment.Moment, absolute: boolean = true): number {
         if (!time) {
             time = moment()
         }
 
         if (time.isSame(this.getMoment(), "minutes")) {
-            return new Big(0)
+            return 0
         }
 
         let start: moment.Moment = this.moment
         let end: moment.Moment = time
-        let sign: Big = new Big(1)
+        let sign: number = 1
 
         // Swap if we're diffing back in time.
         if (this.moment.isAfter(time)) {
             start = time
             end = this.moment
             // We only need to negate if absolute is false.
-            sign = new Big(absolute ? 1 : -1)
+            sign = absolute ? 1 : -1
         }
 
         // Count the business time diff by iterating in steps the length of the
         // precision and checking if each step counts as business time.
-        let diff: Big = new Big(0)
+        let diff: number = 0
         let next: BusinessTime = new BusinessTime(start.clone())
         while (next.isBefore(end)) {
             if (next.isBusinessTime()) {
-                diff = diff.add(1)
+                diff += 1
             }
             next = next.add(this.precision)
         }
 
-        return diff.mul(sign)
+        return diff * sign
     }
 
     /**
@@ -183,8 +181,7 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): moment.Duration {
-        const diffInBusinessSeconds = this.diffInBusinessTime(time, absolute)
-            .mul(this.precision.asSeconds())
+        const diffInBusinessSeconds = this.diffInBusinessTime(time, absolute) * this.precision.asSeconds()
         return moment.duration(Number(diffInBusinessSeconds), "seconds")
     }
 
