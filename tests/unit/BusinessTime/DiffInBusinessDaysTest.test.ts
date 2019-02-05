@@ -54,7 +54,9 @@ describe("getting difference in business days", () => {
             )
 
             // When we get the diff in business days from another day;
-            const diff = businessTime.diffInBusinessDays(moment.utc(otherDay, TEST_FORMAT))
+            const diff = businessTime.diffInBusinessDays(
+                moment.utc(otherDay, TEST_FORMAT),
+            )
 
             // Then we should get the expected diff.
             expect(Number(diff)).toEqual(expectedDiff)

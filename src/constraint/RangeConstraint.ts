@@ -1,5 +1,5 @@
 import * as moment from "moment"
-import {IBusinessTimeConstraint} from "./BusinessTimeConstraint"
+import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 
 export abstract class RangeConstraint implements IBusinessTimeConstraint {
     protected constructor(

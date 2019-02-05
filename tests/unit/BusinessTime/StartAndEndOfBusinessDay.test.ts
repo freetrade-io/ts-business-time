@@ -1,5 +1,5 @@
-import {BusinessTime} from "../../../src"
-import {TEST_FORMAT} from "../../index"
+import { BusinessTime } from "../../../src"
+import { TEST_FORMAT } from "../../index"
 
 describe("finding the start and end of a business day", () => {
     test.each([
