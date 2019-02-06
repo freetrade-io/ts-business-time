@@ -7,6 +7,8 @@ dist: node_modules $(shell find src -type f) prettier
 .PHONY: prettier
 prettier:
 	./node_modules/.bin/prettier ./src/**/*.ts ./tests/**/*.ts --write
+	# Fix Prettier bug with ;
+	sed -i 's/;\[/[/g' ./src/constraint/RangeConstraint.ts
 
 .PHONY: test
 test:
