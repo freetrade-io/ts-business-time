@@ -65,10 +65,15 @@ describe("adding business days", () => {
         "testAddBusinessDaysDefault",
         (time: string, businessDaysToAdd: number, expectedNewTime: string) => {
             // Given we have a business time for a specific time;
-            const businessTime: BusinessTime = new BusinessTime(time, TEST_FORMAT)
+            const businessTime: BusinessTime = new BusinessTime(
+                time,
+                TEST_FORMAT,
+            )
 
             // When we add an amount of business days to it;
-            const added: BusinessTime = businessTime.addBusinessDays(businessDaysToAdd)
+            const added: BusinessTime = businessTime.addBusinessDays(
+                businessDaysToAdd,
+            )
 
             // Then we should get the expected new time.
             expect(added.format(TEST_FORMAT)).toBe(expectedNewTime)

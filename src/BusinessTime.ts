@@ -140,6 +140,10 @@ export class BusinessTime {
             time = moment()
         }
 
+        if (!time.isValid()) {
+            throw new Error("Invalid time passed for diff")
+        }
+
         if (time.isSame(this.getMoment(), "minutes")) {
             return 0
         }
@@ -182,7 +186,7 @@ export class BusinessTime {
         absolute: boolean = true,
     ): moment.Duration {
         const diffInBusinessSeconds = this.diffInBusinessTime(time, absolute) * this.precision.asSeconds()
-        return moment.duration(Number(diffInBusinessSeconds), "seconds")
+        return moment.duration(diffInBusinessSeconds, "seconds")
     }
 
     /**
@@ -241,7 +245,7 @@ export class BusinessTime {
     }
 
     add(amount?: DurationInputArg1, unit?: DurationInputArg2): BusinessTime {
-        return this.atMoment(this.moment.clone().add(Number(amount), unit))
+        return this.atMoment(this.moment.clone().add(amount, unit))
     }
 
     subtract(
