@@ -1,11 +1,15 @@
 import * as moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
+import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
 
-export abstract class RangeConstraint implements IBusinessTimeConstraint {
+export abstract class RangeConstraint extends CombinatorialConstraint
+    implements IBusinessTimeConstraint {
     protected constructor(
         private readonly min: number,
         private readonly max: number,
     ) {
+        super()
+
         // Keep the min and max within the valid range.
         this.min = Math.max(min, this.minMin())
         this.max = Math.min(max, this.maxMax())

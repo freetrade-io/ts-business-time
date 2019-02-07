@@ -12,8 +12,8 @@ import {WeekDays} from "./constraint/WeekDays"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
-    private readonly precision: moment.Duration
-    private readonly constraints: IBusinessTimeConstraint[]
+    private precision: moment.Duration
+    private constraints: IBusinessTimeConstraint[]
 
     private lengthOfBusinessDayCached?: moment.Duration = undefined
 
@@ -163,7 +163,7 @@ export class BusinessTime {
         // Count the business time diff by iterating in steps the length of the
         // precision and checking if each step counts as business time.
         let diff: number = 0
-        let next: BusinessTime = new BusinessTime(start.clone())
+        let next: BusinessTime = this.atMoment(start)
         while (next.isBefore(end)) {
             if (next.isBusinessTime()) {
                 diff += 1
@@ -187,6 +187,12 @@ export class BusinessTime {
     ): moment.Duration {
         const diffInBusinessSeconds = this.diffInBusinessTime(time, absolute) * this.precision.asSeconds()
         return moment.duration(diffInBusinessSeconds, "seconds")
+    }
+
+    setBusinessTimeConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
+        this.constraints = constraints
+
+        return this
     }
 
     /**
@@ -232,7 +238,7 @@ export class BusinessTime {
 
         if (this.lengthOfBusinessDayCached.asHours() > 24) {
             throw new Error(
-                "Length of business day cannot be more than 24 hours" +
+                "Length of business day cannot be more than 24 hours " +
                     `(set to ${this.lengthOfBusinessDayCached.asHours()} hours)`,
             )
         }
@@ -305,6 +311,10 @@ export class BusinessTime {
             // We're using a fixed specific day for the default to keep
             // behaviour consistent.
             typicalDay = moment("2018-05-23T00:00:00Z", ISO_8601)
+        }
+
+        if (!typicalDay.isValid()) {
+            throw new Error("Invalid typical day passed to determineLengthOfBusinessDay")
         }
 
         const typicalBusinessDay = this.atMoment(typicalDay)

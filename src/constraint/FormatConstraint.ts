@@ -1,5 +1,6 @@
 import * as moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
+import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
 
 /**
  * Constraint that matches business times using a date time format and
@@ -10,11 +11,14 @@ import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
  *
  * https://momentjs.com/docs/#/displaying/format/
  */
-export class FormatConstraint implements IBusinessTimeConstraint {
+export class FormatConstraint extends CombinatorialConstraint
+    implements IBusinessTimeConstraint {
     constructor(
         private readonly format: string,
         private readonly matches: string[],
-    ) {}
+    ) {
+        super()
+    }
 
     isBusinessTime(time: moment.Moment): boolean {
         return this.matches.includes(time.format(this.format))
