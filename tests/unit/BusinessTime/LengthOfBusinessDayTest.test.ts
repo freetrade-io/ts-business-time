@@ -111,7 +111,9 @@ describe("getting the length of a business day", () => {
         expect(error).toBeInstanceOf(Error)
         if (error) {
             // Keep compiler happy.
-            expect(error.message).toBe("Length of business day cannot be more than 24 hours (set to 25 hours)")
+            expect(error.message).toBe(
+                "Length of business day cannot be more than 24 hours (set to 25 hours)",
+            )
         }
     })
 })

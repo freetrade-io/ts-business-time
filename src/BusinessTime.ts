@@ -53,7 +53,7 @@ export class BusinessTime {
         }
 
         if (businessDaysToAdd < 0) {
-            return this.subBusinessDays(Math.abs(businessDaysToAdd))
+            return this.subtractBusinessDays(Math.abs(businessDaysToAdd))
         }
 
         // Jump ahead in whole days first, because the business days to add
@@ -79,11 +79,11 @@ export class BusinessTime {
         return next
     }
 
-    subBusinessDay(): BusinessTime {
-        return this.subBusinessDays(1)
+    subtractBusinessDay(): BusinessTime {
+        return this.subtractBusinessDays(1)
     }
 
-    subBusinessDays(businessDaysToSub: number): BusinessTime {
+    subtractBusinessDays(businessDaysToSub: number): BusinessTime {
         if (businessDaysToSub === 0) {
             return this.clone()
         }
@@ -109,6 +109,56 @@ export class BusinessTime {
             prev = prev.subtract(this.precision)
             if (prev.isBusinessTime()) {
                 businessDaysToSub -= decrement
+            }
+        }
+
+        return prev
+    }
+
+    addBusinessHour(): BusinessTime {
+        return this.addBusinessHours(1)
+    }
+
+    addBusinessHours(businessHoursToAdd: number): BusinessTime {
+        if (businessHoursToAdd === 0) {
+            return this.clone()
+        }
+
+        if (businessHoursToAdd < 0) {
+            return this.subtractBusinessHours(Math.abs(businessHoursToAdd))
+        }
+
+        let next: BusinessTime = this.clone()
+        const decrement: number = this.precision.asHours()
+        while (businessHoursToAdd > 0) {
+            if (next.isBusinessTime()) {
+                businessHoursToAdd -= decrement
+            }
+            next = next.add(this.precision)
+        }
+
+        return next
+    }
+
+    subtractBusinessHour(): BusinessTime {
+        return this.subtractBusinessHours(1)
+    }
+
+    subtractBusinessHours(businessHoursToSub: number): BusinessTime {
+        if (businessHoursToSub === 0) {
+            return this.clone()
+        }
+
+        if (businessHoursToSub < 0) {
+            return this.addBusinessHours(Math.abs(businessHoursToSub))
+        }
+
+        let prev: BusinessTime = this.clone()
+        const decrement: number = this.precision.asHours()
+        while (businessHoursToSub > 0) {
+            prev = prev.subtract(this.precision)
+            if (prev.isBusinessTime()) {
+                businessHoursToSub -= decrement
             }
         }
 
@@ -301,6 +351,24 @@ export class BusinessTime {
 
     getMoment(): moment.Moment {
         return this.moment.clone()
+    }
+
+     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
+         return new BusinessTime(
+             this.getMoment(),
+             ISO_8601,
+             this.precision,
+             constraints,
+         )
+    }
+
+    withPrecision(precision: moment.Duration): BusinessTime {
+        return new BusinessTime(
+            this.getMoment(),
+            ISO_8601,
+            precision,
+            this.constraints,
+        )
     }
 
     private determineLengthOfBusinessDay(
