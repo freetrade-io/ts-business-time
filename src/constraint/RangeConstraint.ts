@@ -1,9 +1,11 @@
 import * as moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
+import { DefaultNarration } from "./narration/DefaultNarration"
+import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
 
 export abstract class RangeConstraint extends CombinatorialConstraint
-    implements IBusinessTimeConstraint {
+    implements IBusinessTimeConstraint, IBusinessTimeNarrator {
     protected constructor(
         private readonly min: number,
         private readonly max: number,
@@ -43,5 +45,16 @@ export abstract class RangeConstraint extends CombinatorialConstraint
             this.relevantValueOf(time) >= this.min &&
             this.relevantValueOf(time) <= this.max
         )
+    }
+
+    /**
+     * Get a business-relevant description for the given time.
+     */
+    narrate(time: moment.Moment): string {
+        if (this.isBusinessTime(time)) {
+            return DefaultNarration.BUSINESS_TIME
+        }
+
+        return DefaultNarration.NON_BUSINESS_TIME
     }
 }

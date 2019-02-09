@@ -9,6 +9,9 @@ import {
 import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
 import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
 import {WeekDays} from "./constraint/WeekDays"
+import {IBusinessTimeNarrator} from "./constraint/narration/IBusinessTimeNarrator"
+import {AnyTime} from "./constraint/AnyTime"
+import {DefaultNarration} from "./constraint/narration/DefaultNarration"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
@@ -22,8 +25,8 @@ export class BusinessTime {
         format?: moment.MomentFormatSpecification,
         precision?: moment.Duration,
         constraints: IBusinessTimeConstraint[] = [
-            new BetweenHoursOfDay(9, 17),
             new WeekDays(),
+            new BetweenHoursOfDay(9, 17),
         ],
     ) {
         this.moment = moment.utc(input, format)
@@ -245,6 +248,10 @@ export class BusinessTime {
         return this
     }
 
+    businessName(): string {
+        return this.canonicalNarrator().narrate(this.getMoment())
+    }
+
     /**
      * Get the first business time after the start of this day.
      */
@@ -394,5 +401,29 @@ export class BusinessTime {
             .diffBusiness(endOfBusinessDay)
 
         return this.setLengthOfBusinessDay(lengthOfBusinessDay)
+    }
+
+    /**
+     * Get a narrator for the first business time constraint that determines
+     * whether this time is business time or not.
+     */
+    private canonicalNarrator(): IBusinessTimeNarrator {
+        if (!this.isBusinessTime()) {
+            for (const constraint of this.constraints) {
+                if (!constraint.isBusinessTime(this.getMoment())) {
+                    return new DefaultNarration(constraint)
+                }
+            }
+        }
+
+        if (this.isBusinessTime()) {
+            for (const constraint of this.constraints) {
+                if (constraint.isBusinessTime(this.getMoment())) {
+                    return new DefaultNarration(constraint)
+                }
+            }
+        }
+
+        return new AnyTime()
     }
 }

@@ -1,6 +1,7 @@
 import * as moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
+import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
 
 /**
  * Constraint that matches business times using a date time format and
@@ -12,7 +13,7 @@ import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
  * https://momentjs.com/docs/#/displaying/format/
  */
 export class FormatConstraint extends CombinatorialConstraint
-    implements IBusinessTimeConstraint {
+    implements IBusinessTimeConstraint, IBusinessTimeNarrator {
     constructor(
         private readonly format: string,
         private readonly matches: string[],
@@ -22,5 +23,12 @@ export class FormatConstraint extends CombinatorialConstraint
 
     isBusinessTime(time: moment.Moment): boolean {
         return this.matches.includes(time.format(this.format))
+    }
+
+    /**
+     * Get a business-relevant description for the given time.
+     */
+    narrate(time: moment.Moment): string {
+        return time.format(this.format)
     }
 }
