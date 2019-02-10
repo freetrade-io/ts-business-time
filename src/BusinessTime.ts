@@ -6,17 +6,17 @@ import {
     MomentInput,
     unitOfTime,
 } from "moment"
+import {AnyTime} from "./constraint/AnyTime"
 import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
 import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
-import {WeekDays} from "./constraint/WeekDays"
-import {IBusinessTimeNarrator} from "./constraint/narration/IBusinessTimeNarrator"
-import {AnyTime} from "./constraint/AnyTime"
 import {DefaultNarration} from "./constraint/narration/DefaultNarration"
+import {IBusinessTimeNarrator} from "./constraint/narration/IBusinessTimeNarrator"
+import {WeekDays} from "./constraint/WeekDays"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
     private readonly precision: moment.Duration
-    private constraints: IBusinessTimeConstraint[]
+    private readonly constraints: IBusinessTimeConstraint[]
 
     private lengthOfBusinessDayCached?: moment.Duration = undefined
 
@@ -380,7 +380,11 @@ export class BusinessTime {
         return this.moment.clone()
     }
 
-     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
+    getPrecision(): moment.Duration {
+        return this.precision.clone()
+    }
+
+    withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
          return new BusinessTime(
              this.getMoment(),
              ISO_8601,
