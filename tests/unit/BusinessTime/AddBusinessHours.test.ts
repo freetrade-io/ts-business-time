@@ -32,7 +32,7 @@ describe("adding business hours", () => {
         "add business hour with default behaviour",
         (time: string, expectedNewTime: string) => {
             // Given we have a business time for a specific time;
-            const businessTime = new BusinessTime(time, TEST_FORMAT)
+            const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // When we add a business hour to it;
             const nextBusinessHour = businessTime.addBusinessHour()
@@ -77,7 +77,7 @@ describe("adding business hours", () => {
         "add business hour with default behaviour",
         (time: string, businessHoursToAdd: number, expectedNewTime: string) => {
             // Given we have a business time for a specific time;
-            let businessTime = new BusinessTime(time, TEST_FORMAT)
+            let businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // And we have 15-minute precision;
             businessTime = businessTime.withPrecision(
@@ -129,7 +129,7 @@ describe("adding business hours", () => {
             expectedNewTime: string,
         ) => {
             // Given we have a business time for a specific time;
-            let businessTime = new BusinessTime(time, TEST_FORMAT)
+            let businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // And we set specific business time constraints;
             businessTime = businessTime.withConstraints(constraint)

@@ -63,7 +63,7 @@ describe("getting difference in business hours", () => {
         "diff in business hours default",
         (time: string, otherTime: string, expectedDiff: number) => {
             // Given we have a business time for a particular time;
-            const businessTime = new BusinessTime(time, TEST_FORMAT)
+            const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // When we get the diff in business hours from another time;
             const diff = businessTime.diffInBusinessHours(
@@ -137,7 +137,7 @@ describe("getting difference in business hours", () => {
         "diff in partial business hours default",
         (time: string, otherTime: string, expectedDiff: number) => {
             // Given we have a business time for a particular time;
-            let businessTime = new BusinessTime(time, TEST_FORMAT)
+            let businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // And we have 15-minute precision;
             businessTime = businessTime.withPrecision(

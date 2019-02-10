@@ -1,11 +1,11 @@
-import moment = require("moment")
+import moment = require("moment-timezone")
 import {
     DurationInputArg1,
     DurationInputArg2,
     ISO_8601,
     MomentInput,
     unitOfTime,
-} from "moment"
+} from "moment-timezone"
 import {AnyTime} from "./constraint/AnyTime"
 import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
 import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
@@ -21,17 +21,16 @@ export class BusinessTime {
     private lengthOfBusinessDayCached?: moment.Duration = undefined
 
     constructor(
-        input?: moment.MomentInput,
-        format?: moment.MomentFormatSpecification,
+        time?: moment.Moment,
         precision?: moment.Duration,
         constraints: IBusinessTimeConstraint[] = [
             new WeekDays(),
             new BetweenHoursOfDay(9, 17),
         ],
     ) {
-        this.moment = moment.utc(input, format)
+        this.moment = time || moment.utc()
         if (!this.moment.isValid() || !this.moment.toISOString()) {
-            throw new Error(`Invalid date time for business time: ${input}`)
+            throw new Error(`Invalid date time for business time: ${time}`)
         }
         this.precision = precision ? precision : moment.duration(1, "hour")
         this.constraints = constraints
@@ -265,7 +264,7 @@ export class BusinessTime {
     }
 
     withBusinessTimeConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-        return new BusinessTime(this.moment, ISO_8601, this.precision, constraints)
+        return new BusinessTime(this.getMoment(), this.precision, constraints)
     }
 
     businessName(): string {
@@ -296,6 +295,102 @@ export class BusinessTime {
         }
 
         return end
+    }
+
+    /**
+     * Get this date time floored to the given precision interval in terms of
+     * seconds since the epoch.
+     */
+    floored(precision?: moment.Duration): BusinessTime {
+        if (!precision) {
+            precision = this.precision
+        }
+        const precisionSeconds: number = precision.asSeconds()
+
+        // Allow for sub-hour timezone differences:
+        // Add the timezone remainder, floor, then take the remainder back off.
+        const timeZoneOffset = this.moment.utcOffset()
+        const timeZoneRemainder = timeZoneOffset % 3600
+        const flooredUnix = Math.floor(
+            (
+                Math.floor(
+                    (
+                        this.moment.unix() + timeZoneRemainder
+                    ) / precisionSeconds,
+                ) * precisionSeconds
+            ) - timeZoneRemainder,
+        )
+        const momentFloored = moment.unix(flooredUnix).tz(this.moment.zoneAbbr())
+
+        return new BusinessTime(
+            momentFloored,
+            this.precision,
+            this.constraints,
+        )
+    }
+
+    /**
+     * Get this date time rounded to the given precision interval in terms of
+     * seconds since the epoch.
+     */
+    rounded(precision?: moment.Duration): BusinessTime {
+        if (!precision) {
+            precision = this.precision
+        }
+        const precisionSeconds: number = precision.asSeconds()
+
+        // Allow for sub-hour timezone differences:
+        // Add the timezone remainder, round, then take the remainder back off.
+        const timeZoneOffset = this.moment.utcOffset()
+        const timeZoneRemainder = timeZoneOffset % 3600
+        const roundedUnix = Math.floor(
+            (
+                Math.round(
+                    (
+                        this.moment.unix() + timeZoneRemainder
+                    ) / precisionSeconds,
+                ) * precisionSeconds
+            ) - timeZoneRemainder,
+        )
+        const momentRounded = moment.unix(roundedUnix).tz(this.moment.zoneAbbr())
+
+        return new BusinessTime(
+            momentRounded,
+            this.precision,
+            this.constraints,
+        )
+    }
+
+    /**
+     * Get this date time ceiled to the given precision interval in terms of
+     * seconds since the epoch.
+     */
+    ceiled(precision?: moment.Duration): BusinessTime {
+        if (!precision) {
+            precision = this.precision
+        }
+        const precisionSeconds: number = precision.asSeconds()
+
+        // Allow for sub-hour timezone differences:
+        // Add the timezone remainder, round, then take the remainder back off.
+        const timeZoneOffset = this.moment.utcOffset()
+        const timeZoneRemainder = timeZoneOffset % 3600
+        const ceiledUnix = Math.floor(
+            (
+                Math.ceil(
+                    (
+                        this.moment.unix() + timeZoneRemainder
+                    ) / precisionSeconds,
+                ) * precisionSeconds
+            ) - timeZoneRemainder,
+        )
+        const momentCeiled = moment.unix(ceiledUnix).tz(this.moment.zoneAbbr())
+
+        return new BusinessTime(
+            momentCeiled,
+            this.precision,
+            this.constraints,
+        )
     }
 
     lengthOfBusinessDay(): moment.Duration {
@@ -360,8 +455,7 @@ export class BusinessTime {
 
     clone(): BusinessTime {
         return new BusinessTime(
-            this.moment.toISOString(),
-            ISO_8601,
+            this.getMoment(),
             this.precision,
             this.constraints,
         )
@@ -369,9 +463,8 @@ export class BusinessTime {
 
     atMoment(time: moment.Moment): BusinessTime {
         return new BusinessTime(
-            time.toISOString(),
-            ISO_8601,
-            this.precision,
+            time,
+            this.precision.clone(),
             this.constraints,
         )
     }
@@ -387,7 +480,6 @@ export class BusinessTime {
     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
          return new BusinessTime(
              this.getMoment(),
-             ISO_8601,
              this.precision,
              constraints,
          )
@@ -396,7 +488,6 @@ export class BusinessTime {
     withPrecision(precision: moment.Duration): BusinessTime {
         return new BusinessTime(
             this.getMoment(),
-            ISO_8601,
             precision,
             this.constraints,
         )

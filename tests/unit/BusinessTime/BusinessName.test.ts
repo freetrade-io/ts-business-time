@@ -1,3 +1,4 @@
+import * as moment from "moment"
 import { BusinessTime } from "../../../src"
 import { TEST_FORMAT } from "../../index"
 
@@ -19,7 +20,7 @@ describe("getting the business-relevant name of a time", () => {
         "default business name",
         (time: string, expectedBusinessName: string) => {
             // Given we have a business time for a particular time;
-            const businessTime = new BusinessTime(time, TEST_FORMAT)
+            const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // Then the business name should be as expected.
             expect(businessTime.businessName()).toBe(expectedBusinessName)
@@ -29,8 +30,7 @@ describe("getting the business-relevant name of a time", () => {
     test("fallback business name", () => {
         // Given we have a business time for a particular time;
         let businessTime = new BusinessTime(
-            "Wednesday 2018-05-23 13:00",
-            TEST_FORMAT,
+            moment.utc("Wednesday 2018-05-23 13:00", TEST_FORMAT),
         )
 
         // And it has no business time constraints;

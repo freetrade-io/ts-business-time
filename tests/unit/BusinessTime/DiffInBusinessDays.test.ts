@@ -48,7 +48,7 @@ describe("getting difference in business days", () => {
         "diff in business days default",
         (day: string, otherDay: string, expectedDiff: number) => {
             // Given we have a business time for a particular day;
-            const businessTime = new BusinessTime(day, TEST_FORMAT)
+            const businessTime = new BusinessTime(moment.utc(day, TEST_FORMAT))
 
             // When we get the diff in business days from another day;
             const diff = businessTime.diffInBusinessDays(
@@ -106,7 +106,7 @@ describe("getting difference in business days", () => {
         "diff in partial business days default",
         (time: string, otherTime: string, expectedDiff: number) => {
             // Given we have a business time for a particular time;
-            const businessTime = new BusinessTime(time, TEST_FORMAT)
+            const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
             // When we get the diff in partial business days from another time;
             const diff = businessTime.diffInPartialBusinessDays(

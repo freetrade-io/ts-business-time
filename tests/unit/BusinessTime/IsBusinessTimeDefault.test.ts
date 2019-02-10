@@ -1,3 +1,4 @@
+import * as moment from "moment"
 import { BusinessTime } from "../../../src"
 import { TEST_FORMAT } from "../../index"
 
@@ -23,8 +24,7 @@ describe("determining if a time is business time with default behaviour", () => 
         (time: string, expectedToBeBusinessTime: boolean) => {
             // Given we have a business time for a particular time;
             const businessTime: BusinessTime = new BusinessTime(
-                time,
-                TEST_FORMAT,
+                moment.utc(time, TEST_FORMAT),
             )
 
             // Then it should know whether or not it is business time.

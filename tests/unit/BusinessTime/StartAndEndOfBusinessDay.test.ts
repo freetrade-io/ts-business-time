@@ -1,3 +1,4 @@
+import * as moment from "moment"
 import { BusinessTime } from "../../../src"
 import { TEST_FORMAT } from "../../index"
 
@@ -18,8 +19,7 @@ describe("finding the start and end of a business day", () => {
         (time: string, expectedStartOfBusinessDay: string) => {
             // Given we have a business time for a particular time;
             const businessTime: BusinessTime = new BusinessTime(
-                time,
-                TEST_FORMAT,
+                moment.utc(time, TEST_FORMAT),
             )
 
             // When we get the start of the business day;
@@ -48,8 +48,7 @@ describe("finding the start and end of a business day", () => {
         (time: string, expectedEndOfBusinessDay: string) => {
             // Given we have a business time for a particular time;
             const businessTime: BusinessTime = new BusinessTime(
-                time,
-                TEST_FORMAT,
+                moment.utc(time, TEST_FORMAT),
             )
 
             // When we get the start of the business day;
