@@ -15,7 +15,7 @@ import {DefaultNarration} from "./constraint/narration/DefaultNarration"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
-    private precision: moment.Duration
+    private readonly precision: moment.Duration
     private constraints: IBusinessTimeConstraint[]
 
     private lengthOfBusinessDayCached?: moment.Duration = undefined
@@ -168,10 +168,17 @@ export class BusinessTime {
         return prev
     }
 
+    /**
+     * Get the difference between this time and another in whole business days.
+     */
     diffInBusinessDays(time?: moment.Moment, absolute: boolean = true): number {
         return Math.floor(this.diffInPartialBusinessDays(time, absolute))
     }
 
+    /**
+     * Get the difference between this time and another in fractional business
+     * days, calculated in intervals the size of the precision.
+     */
     diffInPartialBusinessDays(
         time?: moment.Moment,
         absolute: boolean = true,
@@ -179,6 +186,21 @@ export class BusinessTime {
         return this.diffInBusinessTime(time, absolute) / (
             this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds()
         )
+    }
+
+    /**
+     * Get the difference between this time and another in whole business hours.
+     */
+    diffInBusinessHours(time?: moment.Moment, absolute: boolean = true): number {
+        return Math.floor(this.diffInPartialBusinessHours(time, absolute))
+    }
+
+    /**
+     * Get the difference between this time and another in fractional business
+     * hours, calculated in intervals the size of the precision.
+     */
+    diffInPartialBusinessHours(time?: moment.Moment, absolute: boolean = true): number {
+        return this.diffInBusinessTime(time, absolute) * this.precision.asHours()
     }
 
     /**
@@ -242,10 +264,8 @@ export class BusinessTime {
         return moment.duration(diffInBusinessSeconds, "seconds")
     }
 
-    setBusinessTimeConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-        this.constraints = constraints
-
-        return this
+    withBusinessTimeConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
+        return new BusinessTime(this.moment, ISO_8601, this.precision, constraints)
     }
 
     businessName(): string {

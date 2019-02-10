@@ -28,13 +28,13 @@ describe("getting the business-relevant name of a time", () => {
 
     test("fallback business name", () => {
         // Given we have a business time for a particular time;
-        const businessTime = new BusinessTime(
+        let businessTime = new BusinessTime(
             "Wednesday 2018-05-23 13:00",
             TEST_FORMAT,
         )
 
         // And it has no business time constraints;
-        businessTime.setBusinessTimeConstraints()
+        businessTime = businessTime.withBusinessTimeConstraints()
 
         // Then a fall-back business time name should be used.
         expect(businessTime.businessName()).toBe(

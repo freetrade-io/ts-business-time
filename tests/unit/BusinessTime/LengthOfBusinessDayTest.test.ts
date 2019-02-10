@@ -67,8 +67,9 @@ describe("getting the length of a business day", () => {
         "determine length of business day",
         (constraint: IBusinessTimeConstraint, expectedSeconds: number) => {
             // Given we have a business time with certain constraints;
-            const businessTime = new BusinessTime()
-            businessTime.setBusinessTimeConstraints(constraint)
+            const businessTime = new BusinessTime().withBusinessTimeConstraints(
+                constraint,
+            )
 
             // When we determine the length of a business day;
             const length: moment.Duration = businessTime.lengthOfBusinessDay()
