@@ -17,9 +17,7 @@ describe("adding business days", () => {
         ["Sunday 2018-05-20 16:00", "Monday 2018-05-21 17:00"],
     ])("add business day default", (time: string, expectedNewTime: string) => {
         // Given we have a business time for a specific time;
-        const businessTime: BusinessTime = new BusinessTime(
-            moment.utc(time, TEST_FORMAT),
-        )
+        const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
 
         // When we add a business day to it;
         const nextBusinessDay: BusinessTime = businessTime.addBusinessDay()
