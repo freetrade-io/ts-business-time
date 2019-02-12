@@ -84,11 +84,14 @@ describe("rounding times", () => {
         ) => {
             // Given we have a business time instance for a specific time;
             const businessTime = new BusinessTime(moment.utc(time, TEST_FORMAT))
+            expect(businessTime.getMoment().isUTC()).toBeTruthy()
+            expect(businessTime.format(TEST_FORMAT)).toBe(time)
 
             // When we floor it to a precision interval.
             const floored = businessTime.floored(precision)
 
             // Then we should get the expected floored time.
+            expect(floored.getMoment().isUTC()).toBeTruthy()
             expect(floored.format(TEST_FORMAT)).toBe(expectedFlooredTime)
         },
     )
