@@ -341,8 +341,8 @@ export class BusinessTime {
 
         // Allow for sub-hour timezone differences:
         // Add the timezone remainder, round, then take the remainder back off.
-        const timeZoneOffset = this.moment.utcOffset()
-        const timeZoneRemainder = timeZoneOffset % 3600
+        const timeZoneOffsetSeconds = this.moment.utcOffset() * 60
+        const timeZoneRemainder = timeZoneOffsetSeconds % 3600
         const roundedUnix = Math.floor(
             (
                 Math.round(
@@ -352,7 +352,7 @@ export class BusinessTime {
                 ) * precisionSeconds
             ) - timeZoneRemainder,
         )
-        const momentRounded = moment.unix(roundedUnix).tz(this.moment.zoneAbbr())
+        const momentRounded = moment.unix(roundedUnix).tz(this.moment.tz() || "UTC")
 
         return new BusinessTime(
             momentRounded,
