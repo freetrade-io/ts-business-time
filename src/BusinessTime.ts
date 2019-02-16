@@ -473,6 +473,10 @@ export class BusinessTime {
         return this.moment.clone()
     }
 
+    getConstraints(): IBusinessTimeConstraint[] {
+        return this.constraints
+    }
+
     getPrecision(): moment.Duration {
         return this.precision.clone()
     }
