@@ -1,7 +1,7 @@
 import moment = require("moment-timezone")
 import { BusinessTimeFactory } from "../../../src/BusinessTimeFactory"
-import {DaysOfWeek} from "../../../src/constraint/DaysOfWeek"
-import {TEST_FORMAT} from "../../index"
+import { DaysOfWeek } from "../../../src/constraint/DaysOfWeek"
+import { TEST_FORMAT } from "../../index"
 
 describe("business time factory", () => {
     test("calling make()", () => {
@@ -11,7 +11,9 @@ describe("business time factory", () => {
         factory = factory.withPrecision(moment.duration(30, "minutes"))
 
         // When we use it to make a business time instance;
-        const businessTime = factory.make(moment.utc("Wednesday 2018-05-16 11:00", TEST_FORMAT))
+        const businessTime = factory.make(
+            moment.utc("Wednesday 2018-05-16 11:00", TEST_FORMAT),
+        )
 
         // Then the instance should be set up correctly.
         expect(businessTime.getPrecision().asMinutes()).toBe(30)
@@ -32,6 +34,8 @@ describe("business time factory", () => {
         // Then the instance should be set up correctly.
         expect(businessTime.getPrecision().asMinutes()).toBe(15)
         expect(businessTime.getConstraints().length).toBe(1)
-        expect(businessTime.format("YYYY-MM-DD HH:mm")).toEqual(now.format("YYYY-MM-DD HH:mm"))
+        expect(businessTime.format("YYYY-MM-DD HH:mm")).toEqual(
+            now.format("YYYY-MM-DD HH:mm"),
+        )
     })
 })

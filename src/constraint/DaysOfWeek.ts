@@ -1,6 +1,13 @@
 import { FormatConstraint } from "./FormatConstraint"
 
-type DayOfWeek = "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday"
+type DayOfWeek =
+    | "Sunday"
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
 
 /**
  * Constraint that matches the given days of week with their full names.
