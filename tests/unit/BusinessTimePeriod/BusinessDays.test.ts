@@ -80,7 +80,11 @@ describe("business days time period", () => {
 
     test.each([
         ["Monday 2018-05-21 10:00", "Monday 2018-05-21 10:00", ["Monday"]],
-        ["Monday 2018-05-21 10:00", "Tuesday 2018-05-22 10:00", ["Monday", "Tuesday"]],
+        [
+            "Monday 2018-05-21 10:00",
+            "Tuesday 2018-05-22 10:00",
+            ["Monday", "Tuesday"],
+        ],
         [
             "Wednesday 2018-05-23 10:00",
             "Friday 2018-05-25 10:00",
@@ -91,22 +95,21 @@ describe("business days time period", () => {
             "Monday 2018-05-28 10:00",
             ["Friday", "Saturday", "Sunday", "Monday"],
         ],
-    ])("days in a day period", (
-        startTime: string,
-        endTime: string,
-        expectedDays: string[],
-    ) => {
-        // Given we have a business time period with a particular start and end;
-        const timePeriod = BusinessTimePeriod.fromMoments(
-            moment.utc(startTime, TEST_FORMAT),
-            moment.utc(endTime, TEST_FORMAT),
-        )
+    ])(
+        "days in a day period",
+        (startTime: string, endTime: string, expectedDays: string[]) => {
+            // Given we have a business time period with a particular start and end;
+            const timePeriod = BusinessTimePeriod.fromMoments(
+                moment.utc(startTime, TEST_FORMAT),
+                moment.utc(endTime, TEST_FORMAT),
+            )
 
-        // When we get all the days inside it;
-        const days = timePeriod.allDays()
+            // When we get all the days inside it;
+            const days = timePeriod.allDays()
 
-        // Then they should be as expected.
-        const allDayNames = days.map((day) => day.format("dddd"))
-        expect(allDayNames).toEqual(expectedDays)
-    })
+            // Then they should be as expected.
+            const allDayNames = days.map((day) => day.format("dddd"))
+            expect(allDayNames).toEqual(expectedDays)
+        },
+    )
 })
