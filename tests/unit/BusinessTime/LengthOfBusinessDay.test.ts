@@ -39,28 +39,31 @@ describe("getting the length of a business day", () => {
     )
 
     test.each([
-        [new BetweenHoursOfDay(9, 17), 8 * 60 * 60],
-        [new BetweenHoursOfDay(9, 12), 3 * 60 * 60],
-        [new BetweenHoursOfDay(8, 18), 10 * 60 * 60],
-        [new BetweenHoursOfDay(0, 23), 23 * 60 * 60],
-        [new BetweenHoursOfDay(0, 24), 24 * 60 * 60],
+        [new BetweenHoursOfDay("09", "17"), 8 * 60 * 60],
+        [new BetweenHoursOfDay("09", "12"), 3 * 60 * 60],
+        [new BetweenHoursOfDay("08", "18"), 10 * 60 * 60],
+        [new BetweenHoursOfDay("00", "23"), 23 * 60 * 60],
+        [new BetweenHoursOfDay("00", "24"), 24 * 60 * 60],
         [new WeekDays(), 24 * 60 * 60],
         [
-            new AllConstraints(new WeekDays(), new BetweenHoursOfDay(9, 17)),
+            new AllConstraints(
+                new WeekDays(),
+                new BetweenHoursOfDay("09", "17"),
+            ),
             8 * 60 * 60,
         ],
         [
             // Exclude lunch time.
-            new BetweenHoursOfDay(9, 17).exceptFor(
-                new BetweenHoursOfDay(13, 14),
+            new BetweenHoursOfDay("09", "17").exceptFor(
+                new BetweenHoursOfDay("13", "14"),
             ),
             7 * 60 * 60,
         ],
         [
             // Multiple periods.
-            new BetweenHoursOfDay(8, 10)
-                .orAlternatively(new BetweenHoursOfDay(12, 14))
-                .orAlternatively(new BetweenHoursOfDay(16, 18)),
+            new BetweenHoursOfDay("08", "10")
+                .orAlternatively(new BetweenHoursOfDay("12", "14"))
+                .orAlternatively(new BetweenHoursOfDay("16", "18")),
             6 * 60 * 60,
         ],
     ])(

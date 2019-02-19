@@ -12,7 +12,7 @@ export class BusinessTimeFactory {
         precision?: moment.Duration,
         constraints: IBusinessTimeConstraint[] = [
             new WeekDays(),
-            new BetweenHoursOfDay(9, 17),
+            new BetweenHoursOfDay("09", "17"),
         ],
     ) {
         // Default to hour precision.

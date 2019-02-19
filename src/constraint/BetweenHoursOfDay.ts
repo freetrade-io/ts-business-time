@@ -1,14 +1,22 @@
 import * as moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
+import { HourOfDay } from "./HoursOfDay"
 import { RangeConstraint } from "./RangeConstraint"
 
 export class BetweenHoursOfDay extends RangeConstraint
     implements IBusinessTimeConstraint {
-    constructor(min: number = 9, max: number = 17) {
+    static hourOfDayIndex(hourOfDay: HourOfDay | "24"): number {
+        return Number(hourOfDay)
+    }
+
+    constructor(min: HourOfDay = "09", max: HourOfDay | "24" = "17") {
+        const minIndex = BetweenHoursOfDay.hourOfDayIndex(min)
+        const maxIndex = BetweenHoursOfDay.hourOfDayIndex(max)
+
         // Subtract one from the max as we want to match it exclusively for
         // times of day. E.g. 17 should be a cut off at 5pm, excluding times
         // from 5pm onwards.
-        super(min, max - 1)
+        super(minIndex, maxIndex - 1)
     }
 
     minMin(): number {

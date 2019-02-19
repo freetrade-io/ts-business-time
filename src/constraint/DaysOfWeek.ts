@@ -1,6 +1,6 @@
 import { FormatConstraint } from "./FormatConstraint"
 
-type DayOfWeek =
+export type DayOfWeek =
     | "Sunday"
     | "Monday"
     | "Tuesday"

@@ -96,8 +96,8 @@ describe("adding business hours", () => {
         [
             "Monday 2018-05-14 09:00",
             // Exclude lunch time.
-            new BetweenHoursOfDay(9, 17).exceptFor(
-                new BetweenHoursOfDay(13, 14),
+            new BetweenHoursOfDay("09", "17").exceptFor(
+                new BetweenHoursOfDay("13", "14"),
             ),
             4,
             "Monday 2018-05-14 13:00",
@@ -105,8 +105,8 @@ describe("adding business hours", () => {
         [
             "Monday 2018-05-14 09:00",
             // Exclude lunch time.
-            new BetweenHoursOfDay(9, 17).exceptFor(
-                new BetweenHoursOfDay(13, 14),
+            new BetweenHoursOfDay("09", "17").exceptFor(
+                new BetweenHoursOfDay("13", "14"),
             ),
             5, // Would be 14:00, but we're not counting lunch time.
             "Monday 2018-05-14 15:00",
@@ -114,8 +114,8 @@ describe("adding business hours", () => {
         [
             "Monday 2018-05-14 09:00",
             // Exclude lunch time.
-            new BetweenHoursOfDay(9, 17).exceptFor(
-                new BetweenHoursOfDay(13, 14),
+            new BetweenHoursOfDay("09", "17").exceptFor(
+                new BetweenHoursOfDay("13", "14"),
             ),
             7 + 5, // 1 full day, plus 5 hours.
             "Tuesday 2018-05-15 15:00",

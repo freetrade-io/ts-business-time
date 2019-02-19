@@ -25,7 +25,7 @@ export class BusinessTime {
         precision?: moment.Duration,
         constraints: IBusinessTimeConstraint[] = [
             new WeekDays(),
-            new BetweenHoursOfDay(9, 17),
+            new BetweenHoursOfDay("09", "17"),
         ],
     ) {
         this.moment = time || moment.utc()
