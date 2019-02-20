@@ -45,11 +45,11 @@ export class BetweenDaysOfWeek extends RangeConstraint {
     }
 
     maxMax(): number {
-        return BetweenDaysOfWeek.Min
+        return BetweenDaysOfWeek.Max
     }
 
     minMin(): number {
-        return BetweenDaysOfWeek.Max
+        return BetweenDaysOfWeek.Min
     }
 
     relevantValueOf(time: moment.Moment): number {
