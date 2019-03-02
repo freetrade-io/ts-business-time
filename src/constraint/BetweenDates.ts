@@ -1,5 +1,5 @@
 import moment = require("moment-timezone")
-import {RangeConstraint} from "./RangeConstraint"
+import { RangeConstraint } from "./RangeConstraint"
 
 export class BetweenDates extends RangeConstraint {
     static readonly FORMAT = "YYYY-MM-DD"
