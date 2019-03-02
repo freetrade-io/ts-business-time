@@ -441,6 +441,14 @@ export class BusinessTime {
         return this.moment.isBefore(inp, granularity)
     }
 
+    isSameOrAfter(inp?: MomentInput, granularity?: unitOfTime.StartOf): boolean {
+        return this.moment.isSameOrAfter(inp, granularity)
+    }
+
+    isSameOrBefore(inp?: MomentInput, granularity?: unitOfTime.StartOf): boolean {
+        return this.moment.isSameOrBefore(inp, granularity)
+    }
+
     startOf(unit: unitOfTime.StartOf): BusinessTime {
         return this.atMoment(this.moment.startOf(unit))
     }
