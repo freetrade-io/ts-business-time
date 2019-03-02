@@ -2,7 +2,8 @@ import { IBusinessTimeConstraint } from "../../../../src/constraint/BusinessTime
 import { NotConstraint } from "../../../../src/constraint/composite/NotConstraint"
 import {
     allMatchingWednesdayOnePm,
-    noneMatchingWednesdayOnePm, someMatchingWednesdayOnePm,
+    noneMatchingWednesdayOnePm,
+    someMatchingWednesdayOnePm,
     wednesdayOnePm,
 } from "./CompositeConstraintProviders"
 
