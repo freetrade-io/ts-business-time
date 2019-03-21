@@ -1,5 +1,7 @@
 # TypeScript Business Time (Market Hours)
 
+[![Build Status](https://travis-ci.org/freetrade-io/ts-business-time.svg?branch=master)](https://travis-ci.org/freetrade-io/ts-business-time)
+
 "Business time" logic in TypeScript (aka "market hours", "business hours",
 "working days" etc). This can be useful for calculating shipping dates or market
 open and close times, for example.
