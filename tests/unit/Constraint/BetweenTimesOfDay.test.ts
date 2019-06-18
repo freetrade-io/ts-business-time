@@ -44,14 +44,17 @@ describe("the 'between times of day' business time constraint", () => {
         ["Wednesday 2018-05-23 17:00", "outside business hours"],
         ["Wednesday 2018-05-23 17:01", "outside business hours"],
         ["Wednesday 2018-05-23 23:00", "outside business hours"],
-    ])("between times of day narration", (time: string, expectedNarration: string) => {
-        // Given we have a time;
-        const timeMoment = moment.utc(time, TEST_FORMAT)
+    ])(
+        "between times of day narration",
+        (time: string, expectedNarration: string) => {
+            // Given we have a time;
+            const timeMoment = moment.utc(time, TEST_FORMAT)
 
-        // And a constraint for between 09:00 and 17:00.
-        const constraint = new BetweenTimesOfDay("09:00", "17:00")
+            // And a constraint for between 09:00 and 17:00.
+            const constraint = new BetweenTimesOfDay("09:00", "17:00")
 
-        // Then the constraint should narrate the time as expected.
-        expect(constraint.narrate(timeMoment)).toEqual(expectedNarration)
-    })
+            // Then the constraint should narrate the time as expected.
+            expect(constraint.narrate(timeMoment)).toEqual(expectedNarration)
+        },
+    )
 })
