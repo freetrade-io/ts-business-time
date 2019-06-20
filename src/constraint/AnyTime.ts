@@ -1,4 +1,4 @@
-import * as moment from "moment"
+import moment = require("moment-timezone")
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { CombinatorialConstraint } from "./composite/CombinatorialConstraint"
 import { DefaultNarration } from "./narration/DefaultNarration"

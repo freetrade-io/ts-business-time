@@ -1,4 +1,4 @@
-import * as moment from "moment"
+import moment = require("moment-timezone")
 import { DayOfWeek } from "./DaysOfWeek"
 import { RangeConstraint } from "./RangeConstraint"
 

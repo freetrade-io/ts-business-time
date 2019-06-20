@@ -6,12 +6,12 @@ import {
     MomentInput,
     unitOfTime,
 } from "moment-timezone"
-import {AnyTime} from "./constraint/AnyTime"
-import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
-import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
-import {DefaultNarration} from "./constraint/narration/DefaultNarration"
-import {IBusinessTimeNarrator} from "./constraint/narration/IBusinessTimeNarrator"
-import {WeekDays} from "./constraint/WeekDays"
+import { AnyTime } from "./constraint/AnyTime"
+import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
+import { IBusinessTimeConstraint } from "./constraint/BusinessTimeConstraint"
+import { DefaultNarration } from "./constraint/narration/DefaultNarration"
+import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
+import { WeekDays } from "./constraint/WeekDays"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
@@ -69,7 +69,8 @@ export class BusinessTime {
         // skipping ahead in days.
         businessDaysToAdd -= this.diffInPartialBusinessDays(next.getMoment())
 
-        const decrement: number = this.precision.asDays() / this.lengthOfBusinessDay().asDays()
+        const decrement: number =
+            this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
@@ -105,7 +106,8 @@ export class BusinessTime {
         // skipping back in days.
         businessDaysToSub -= this.diffInPartialBusinessDays(prev.getMoment())
 
-        const decrement: number = this.precision.asDays() / this.lengthOfBusinessDay().asDays()
+        const decrement: number =
+            this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
         while (businessDaysToSub > 0) {
             prev = prev.subtract(this.precision)
@@ -182,15 +184,20 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): number {
-        return this.diffInBusinessTime(time, absolute) / (
-            this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds()
+        return (
+            this.diffInBusinessTime(time, absolute) /
+            (this.lengthOfBusinessDay().asSeconds() /
+                this.precision.asSeconds())
         )
     }
 
     /**
      * Get the difference between this time and another in whole business hours.
      */
-    diffInBusinessHours(time?: moment.Moment, absolute: boolean = true): number {
+    diffInBusinessHours(
+        time?: moment.Moment,
+        absolute: boolean = true,
+    ): number {
         return Math.floor(this.diffInPartialBusinessHours(time, absolute))
     }
 
@@ -198,8 +205,13 @@ export class BusinessTime {
      * Get the difference between this time and another in fractional business
      * hours, calculated in intervals the size of the precision.
      */
-    diffInPartialBusinessHours(time?: moment.Moment, absolute: boolean = true): number {
-        return this.diffInBusinessTime(time, absolute) * this.precision.asHours()
+    diffInPartialBusinessHours(
+        time?: moment.Moment,
+        absolute: boolean = true,
+    ): number {
+        return (
+            this.diffInBusinessTime(time, absolute) * this.precision.asHours()
+        )
     }
 
     /**
@@ -259,11 +271,14 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): moment.Duration {
-        const diffInBusinessSeconds = this.diffInBusinessTime(time, absolute) * this.precision.asSeconds()
+        const diffInBusinessSeconds =
+            this.diffInBusinessTime(time, absolute) * this.precision.asSeconds()
         return moment.duration(diffInBusinessSeconds, "seconds")
     }
 
-    withBusinessTimeConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
+    withBusinessTimeConstraints(
+        ...constraints: IBusinessTimeConstraint[]
+    ): BusinessTime {
         return new BusinessTime(this.getMoment(), this.precision, constraints)
     }
 
@@ -312,21 +327,17 @@ export class BusinessTime {
         const timeZoneOffsetSeconds = this.moment.utcOffset() * 60
         const timeZoneRemainder = timeZoneOffsetSeconds % 3600
         const flooredUnix = Math.floor(
-            (
-                Math.floor(
-                    (
-                        this.moment.unix() + timeZoneRemainder
-                    ) / precisionSeconds,
-                ) * precisionSeconds
-            ) - timeZoneRemainder,
+            Math.floor(
+                (this.moment.unix() + timeZoneRemainder) / precisionSeconds,
+            ) *
+                precisionSeconds -
+                timeZoneRemainder,
         )
-        const momentFloored = moment.unix(flooredUnix).tz(this.moment.tz() || "UTC")
+        const momentFloored = moment
+            .unix(flooredUnix)
+            .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(
-            momentFloored,
-            this.precision,
-            this.constraints,
-        )
+        return new BusinessTime(momentFloored, this.precision, this.constraints)
     }
 
     /**
@@ -344,21 +355,17 @@ export class BusinessTime {
         const timeZoneOffsetSeconds = this.moment.utcOffset() * 60
         const timeZoneRemainder = timeZoneOffsetSeconds % 3600
         const roundedUnix = Math.floor(
-            (
-                Math.round(
-                    (
-                        this.moment.unix() + timeZoneRemainder
-                    ) / precisionSeconds,
-                ) * precisionSeconds
-            ) - timeZoneRemainder,
+            Math.round(
+                (this.moment.unix() + timeZoneRemainder) / precisionSeconds,
+            ) *
+                precisionSeconds -
+                timeZoneRemainder,
         )
-        const momentRounded = moment.unix(roundedUnix).tz(this.moment.tz() || "UTC")
+        const momentRounded = moment
+            .unix(roundedUnix)
+            .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(
-            momentRounded,
-            this.precision,
-            this.constraints,
-        )
+        return new BusinessTime(momentRounded, this.precision, this.constraints)
     }
 
     /**
@@ -376,21 +383,17 @@ export class BusinessTime {
         const timeZoneOffsetSeconds = this.moment.utcOffset() * 60
         const timeZoneRemainder = timeZoneOffsetSeconds % 3600
         const ceiledUnix = Math.floor(
-            (
-                Math.ceil(
-                    (
-                        this.moment.unix() + timeZoneRemainder
-                    ) / precisionSeconds,
-                ) * precisionSeconds
-            ) - timeZoneRemainder,
+            Math.ceil(
+                (this.moment.unix() + timeZoneRemainder) / precisionSeconds,
+            ) *
+                precisionSeconds -
+                timeZoneRemainder,
         )
-        const momentCeiled = moment.unix(ceiledUnix).tz(this.moment.tz() || "UTC")
+        const momentCeiled = moment
+            .unix(ceiledUnix)
+            .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(
-            momentCeiled,
-            this.precision,
-            this.constraints,
-        )
+        return new BusinessTime(momentCeiled, this.precision, this.constraints)
     }
 
     lengthOfBusinessDay(): moment.Duration {
@@ -441,11 +444,17 @@ export class BusinessTime {
         return this.moment.isBefore(inp, granularity)
     }
 
-    isSameOrAfter(inp?: MomentInput, granularity?: unitOfTime.StartOf): boolean {
+    isSameOrAfter(
+        inp?: MomentInput,
+        granularity?: unitOfTime.StartOf,
+    ): boolean {
         return this.moment.isSameOrAfter(inp, granularity)
     }
 
-    isSameOrBefore(inp?: MomentInput, granularity?: unitOfTime.StartOf): boolean {
+    isSameOrBefore(
+        inp?: MomentInput,
+        granularity?: unitOfTime.StartOf,
+    ): boolean {
         return this.moment.isSameOrBefore(inp, granularity)
     }
 
@@ -470,11 +479,7 @@ export class BusinessTime {
     }
 
     atMoment(time: moment.Moment): BusinessTime {
-        return new BusinessTime(
-            time,
-            this.precision.clone(),
-            this.constraints,
-        )
+        return new BusinessTime(time, this.precision.clone(), this.constraints)
     }
 
     getMoment(): moment.Moment {
@@ -490,19 +495,11 @@ export class BusinessTime {
     }
 
     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-         return new BusinessTime(
-             this.getMoment(),
-             this.precision,
-             constraints,
-         )
+        return new BusinessTime(this.getMoment(), this.precision, constraints)
     }
 
     withPrecision(precision: moment.Duration): BusinessTime {
-        return new BusinessTime(
-            this.getMoment(),
-            precision,
-            this.constraints,
-        )
+        return new BusinessTime(this.getMoment(), precision, this.constraints)
     }
 
     private determineLengthOfBusinessDay(
@@ -516,16 +513,22 @@ export class BusinessTime {
         }
 
         if (!typicalDay.isValid()) {
-            throw new Error("Invalid typical day passed to determineLengthOfBusinessDay")
+            throw new Error(
+                "Invalid typical day passed to determineLengthOfBusinessDay",
+            )
         }
 
         const typicalBusinessDay = this.atMoment(typicalDay)
 
-        const startOfBusinessDay = typicalBusinessDay.startOfBusinessDay().getMoment()
-        const endOfBusinessDay = typicalBusinessDay.endOfBusinessDay().getMoment()
-        const lengthOfBusinessDay = this
-            .atMoment(startOfBusinessDay)
-            .diffBusiness(endOfBusinessDay)
+        const startOfBusinessDay = typicalBusinessDay
+            .startOfBusinessDay()
+            .getMoment()
+        const endOfBusinessDay = typicalBusinessDay
+            .endOfBusinessDay()
+            .getMoment()
+        const lengthOfBusinessDay = this.atMoment(
+            startOfBusinessDay,
+        ).diffBusiness(endOfBusinessDay)
 
         return this.setLengthOfBusinessDay(lengthOfBusinessDay)
     }

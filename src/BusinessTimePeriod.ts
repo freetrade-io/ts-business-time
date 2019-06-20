@@ -1,13 +1,21 @@
 import moment = require("moment-timezone")
-import {BusinessTime} from "./BusinessTime"
+import { BusinessTime } from "./BusinessTime"
 
-export class BusinessTimePeriod
-{
-    static fromMoments(start: moment.Moment, end: moment.Moment): BusinessTimePeriod {
-        return new BusinessTimePeriod(new BusinessTime(start), new BusinessTime(end))
+export class BusinessTimePeriod {
+    static fromMoments(
+        start: moment.Moment,
+        end: moment.Moment,
+    ): BusinessTimePeriod {
+        return new BusinessTimePeriod(
+            new BusinessTime(start),
+            new BusinessTime(end),
+        )
     }
 
-    constructor(private readonly start: BusinessTime, private readonly end: BusinessTime) {}
+    constructor(
+        private readonly start: BusinessTime,
+        private readonly end: BusinessTime,
+    ) {}
 
     /**
      * Get an array of business time instances, one for each business day in
@@ -78,18 +86,22 @@ export class BusinessTimePeriod
             }
             // If we advanced by doing that, record it as a sub-period.
             if (next.isAfter(subStart.getMoment())) {
-                subPeriods.push(new BusinessTimePeriod(subStart.clone(), next.clone()))
+                subPeriods.push(
+                    new BusinessTimePeriod(subStart.clone(), next.clone()),
+                )
                 subStart = next.clone()
             }
 
             // When we're in a non-business sub-period, keep going until we hit
             // a business sub-period or the end of the whole period.
-            while ((!next.isBusinessTime()) && next.isBefore(end)) {
+            while (!next.isBusinessTime() && next.isBefore(end)) {
                 next = next.add(next.getPrecision())
             }
             // If we advanced by doing that, record it as a sub-period.
             if (next.isAfter(subStart.getMoment())) {
-                subPeriods.push(new BusinessTimePeriod(subStart.clone(), next.clone()))
+                subPeriods.push(
+                    new BusinessTimePeriod(subStart.clone(), next.clone()),
+                )
             }
         }
 

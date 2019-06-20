@@ -1,6 +1,6 @@
-import * as moment from "moment"
-import {IBusinessTimeNarrator} from "./IBusinessTimeNarrator"
-import {IBusinessTimeConstraint} from "../BusinessTimeConstraint"
+import moment = require("moment-timezone")
+import { IBusinessTimeConstraint } from "../BusinessTimeConstraint"
+import { IBusinessTimeNarrator } from "./IBusinessTimeNarrator"
 
 /**
  * Decorator for business time constraints that ensures they offer business
@@ -10,7 +10,6 @@ import {IBusinessTimeConstraint} from "../BusinessTimeConstraint"
  * Otherwise default narration is provided.
  */
 export class DefaultNarration implements IBusinessTimeNarrator {
-
     static readonly BUSINESS_TIME = "business hours"
     static readonly NON_BUSINESS_TIME = "outside business hours"
 

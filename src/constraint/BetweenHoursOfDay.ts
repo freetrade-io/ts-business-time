@@ -1,4 +1,4 @@
-import * as moment from "moment"
+import moment = require("moment-timezone")
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { HourOfDay } from "./HoursOfDay"
 import { RangeConstraint } from "./RangeConstraint"

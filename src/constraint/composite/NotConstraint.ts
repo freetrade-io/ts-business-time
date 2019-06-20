@@ -1,8 +1,8 @@
-import * as moment from "moment"
-import {IBusinessTimeConstraint} from "../BusinessTimeConstraint"
-import {AllConstraints} from "./AllConstraints"
-import {AnyConstraint} from "./AnyConstraint"
-import {ICombinatorialConstraint} from "./ICombinatorialConstraint"
+import moment = require("moment-timezone")
+import { IBusinessTimeConstraint } from "../BusinessTimeConstraint"
+import { AllConstraints } from "./AllConstraints"
+import { AnyConstraint } from "./AnyConstraint"
+import { ICombinatorialConstraint } from "./ICombinatorialConstraint"
 
 export class NotConstraint implements ICombinatorialConstraint {
     private readonly constraints: IBusinessTimeConstraint[]
@@ -26,15 +26,21 @@ export class NotConstraint implements ICombinatorialConstraint {
      * circular imports.
      */
 
-    andAlso(...additional: IBusinessTimeConstraint[]): ICombinatorialConstraint {
+    andAlso(
+        ...additional: IBusinessTimeConstraint[]
+    ): ICombinatorialConstraint {
         return new AllConstraints(this, ...additional)
     }
 
-    orAlternatively(...alternatives: IBusinessTimeConstraint[]): ICombinatorialConstraint {
+    orAlternatively(
+        ...alternatives: IBusinessTimeConstraint[]
+    ): ICombinatorialConstraint {
         return new AnyConstraint(this, ...alternatives)
     }
 
-    exceptFor(...exceptions: IBusinessTimeConstraint[]): ICombinatorialConstraint {
+    exceptFor(
+        ...exceptions: IBusinessTimeConstraint[]
+    ): ICombinatorialConstraint {
         return new AllConstraints(this, new NotConstraint(...exceptions))
     }
 }

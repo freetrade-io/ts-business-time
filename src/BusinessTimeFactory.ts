@@ -1,8 +1,8 @@
 import moment = require("moment-timezone")
-import {BusinessTime} from "./BusinessTime"
-import {BetweenHoursOfDay} from "./constraint/BetweenHoursOfDay"
-import {IBusinessTimeConstraint} from "./constraint/BusinessTimeConstraint"
-import {WeekDays} from "./constraint/WeekDays"
+import { BusinessTime } from "./BusinessTime"
+import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
+import { IBusinessTimeConstraint } from "./constraint/BusinessTimeConstraint"
+import { WeekDays } from "./constraint/WeekDays"
 
 export class BusinessTimeFactory {
     private readonly precision: moment.Duration
@@ -32,7 +32,9 @@ export class BusinessTimeFactory {
         return this.make(moment.utc())
     }
 
-    withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTimeFactory {
+    withConstraints(
+        ...constraints: IBusinessTimeConstraint[]
+    ): BusinessTimeFactory {
         return new BusinessTimeFactory(this.precision, constraints)
     }
 
