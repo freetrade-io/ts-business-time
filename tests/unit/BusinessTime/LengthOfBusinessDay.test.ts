@@ -3,6 +3,7 @@ import { BusinessTime } from "../../../src"
 import { BetweenHoursOfDay } from "../../../src/constraint/BetweenHoursOfDay"
 import { IBusinessTimeConstraint } from "../../../src/constraint/BusinessTimeConstraint"
 import { AllConstraints } from "../../../src/constraint/composite/AllConstraints"
+import { Dates } from "../../../src/constraint/Dates"
 import { WeekDays } from "../../../src/constraint/WeekDays"
 
 describe("getting the length of a business day", () => {
@@ -119,5 +120,17 @@ describe("getting the length of a business day", () => {
                 "Length of business day cannot be more than 24 hours (set to 25 hours)",
             )
         }
+    })
+
+    test("determine length of business day when typicalDay is provided", () => {
+        // When a typicalDay is set
+        const businessTime = new BusinessTime(moment.utc("2020-04-03T13:50:18.475Z")).withConstraints(
+            new BetweenHoursOfDay("09", "21"),
+            new Dates("2020-04-02", "2020-04-03", "2020-04-06"),
+        ).withTypicalDay(moment.utc("2020-04-02T01:00:00.000Z"))
+
+        // Then the expected length of business day is expected
+        const length: moment.Duration = businessTime.lengthOfBusinessDay()
+        expect(length.asHours()).toEqual(12)
     })
 })
