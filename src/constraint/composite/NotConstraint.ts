@@ -20,6 +20,16 @@ export class NotConstraint implements ICombinatorialConstraint {
         return true
     }
 
+    // These are null, as Not contraints don't really have a upper
+    // and lower bound
+    min(): null | moment.Moment {
+        return null
+    }
+
+    max(): null | moment.Moment {
+        return null
+    }
+
     /**
      * The methods from ICombinatorialConstraint have to be re-implemented here
      * instead of inheriting from a base-class as TypeScript does not allow

@@ -21,6 +21,22 @@ export class AllConstraints implements ICombinatorialConstraint {
         return true
     }
 
+    min(): null | moment.Moment {
+        const minValues = (this.constraints
+            .map((constraint) => constraint.min())
+            .filter((min) => min) as any[]) as moment.Moment[]
+
+        return minValues.length > 0 ? moment.min(...minValues) : null
+    }
+
+    max(): null | moment.Moment {
+        const maxValues = (this.constraints
+            .map((constraint) => constraint.max())
+            .filter((min) => min) as any[]) as moment.Moment[]
+
+        return maxValues.length > 0 ? moment.max(...maxValues) : null
+    }
+
     /**
      * The methods from ICombinatorialConstraint have to be re-implemented here
      * instead of inheriting from a base-class as TypeScript does not allow

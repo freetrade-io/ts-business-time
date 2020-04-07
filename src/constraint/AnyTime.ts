@@ -10,6 +10,14 @@ export class AnyTime extends CombinatorialConstraint
         return true
     }
 
+    min(): null | moment.Moment {
+        return null
+    }
+
+    max(): null | moment.Moment {
+        return null
+    }
+
     narrate(time: moment.Moment): string {
         return new DefaultNarration().narrate(time)
     }

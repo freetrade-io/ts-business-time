@@ -16,4 +16,11 @@ export class DaysOfYear extends FormatConstraint
     constructor(...daysOfYear: string[]) {
         super("Do MMMM", daysOfYear)
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

@@ -16,4 +16,11 @@ export class DaysOfWeek extends FormatConstraint {
     constructor(...daysOfWeek: DayOfWeek[]) {
         super("dddd", daysOfWeek)
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

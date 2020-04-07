@@ -6,12 +6,15 @@ import {
     MomentInput,
     unitOfTime,
 } from "moment-timezone"
+import { BusinessTimeError } from "./BusinessTimeError"
 import { AnyTime } from "./constraint/AnyTime"
 import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
 import { IBusinessTimeConstraint } from "./constraint/BusinessTimeConstraint"
 import { DefaultNarration } from "./constraint/narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
 import { WeekDays } from "./constraint/WeekDays"
+
+const HUMAN_READABLE_FORMAT = "LLLL"
 
 export class BusinessTime {
     private readonly moment: moment.Moment
@@ -75,6 +78,18 @@ export class BusinessTime {
         const decrement: number =
             this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
+        const max = this.maxMoment()
+        if (max && next.getMoment().isAfter(max)) {
+            throw new BusinessTimeError(
+                this.addBusinessDays,
+                `${next.humanReadableDateTime()} is after ${max.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        next = next.minOrCurrent()
+
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
                 businessDaysToAdd -= decrement
@@ -104,6 +119,18 @@ export class BusinessTime {
         // Tuesday 09:00, but intuitively should be Monday 17:00.
         const daysToJump: number = Math.floor(businessDaysToSub)
         let prev: BusinessTime = this.subtract(daysToJump, "days")
+
+        const min = this.minMoment()
+        if (min && prev.getMoment().isBefore(min)) {
+            throw new BusinessTimeError(
+                this.subtractBusinessDays,
+                `${prev.humanReadableDateTime()} is before ${min.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        prev = prev.maxOrCurrent()
 
         // We need to check how much business time we actually covered by
         // skipping back in days.
@@ -137,6 +164,19 @@ export class BusinessTime {
 
         let next: BusinessTime = this.clone()
         const decrement: number = this.precision.asHours()
+
+        const max = this.maxMoment()
+        if (max && next.getMoment().isAfter(max)) {
+            throw new BusinessTimeError(
+                this.addBusinessHours,
+                `${next.humanReadableDateTime()} is after ${max.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        next = next.minOrCurrent()
+
         while (businessHoursToAdd > 0) {
             if (next.isBusinessTime()) {
                 businessHoursToAdd -= decrement
@@ -162,6 +202,19 @@ export class BusinessTime {
 
         let prev: BusinessTime = this.clone()
         const decrement: number = this.precision.asHours()
+
+        const min = this.minMoment()
+        if (min && prev.getMoment().isBefore(min)) {
+            throw new BusinessTimeError(
+                this.subtractBusinessHours,
+                `${prev.humanReadableDateTime()} is before ${min.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        prev = prev.maxOrCurrent()
+
         while (businessHoursToSub > 0) {
             prev = prev.subtract(this.precision)
             if (prev.isBusinessTime()) {
@@ -252,7 +305,19 @@ export class BusinessTime {
         // Count the business time diff by iterating in steps the length of the
         // precision and checking if each step counts as business time.
         let diff: number = 0
+
         let next: BusinessTime = this.atMoment(start)
+
+        const min = this.minMoment()
+        const max = this.maxMoment()
+        if (max && sign > 0 && next.isAfter(max)) {
+            return 0
+        }
+
+        if (min && sign < 0 && next.isBefore(min)) {
+            return 0
+        }
+
         while (next.isBefore(end)) {
             if (next.isBusinessTime()) {
                 diff += 1
@@ -282,7 +347,12 @@ export class BusinessTime {
     withBusinessTimeConstraints(
         ...constraints: IBusinessTimeConstraint[]
     ): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     businessName(): string {
@@ -295,6 +365,19 @@ export class BusinessTime {
     startOfBusinessDay(): BusinessTime {
         // Iterate from the beginning of the day until we hit business time.
         let start: BusinessTime = this.startOf("day")
+        const max = this.maxMoment()
+
+        if (max && start.getMoment().isAfter(max)) {
+            throw new BusinessTimeError(
+                this.startOfBusinessDay,
+                `${start.humanReadableDateTime()} is after ${max.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        start = start.minOrCurrent()
+
         while (!start.isBusinessTime()) {
             start = start.add(this.precision)
         }
@@ -308,6 +391,19 @@ export class BusinessTime {
     endOfBusinessDay(): BusinessTime {
         // Iterate back from the end of the day until we hit business time.
         let end: BusinessTime = this.endOf("day")
+        const min = this.minMoment()
+
+        if (min && end.getMoment().isBefore(min)) {
+            throw new BusinessTimeError(
+                this.endOfBusinessDay,
+                `${end.humanReadableDateTime()} is before ${min.format(
+                    HUMAN_READABLE_FORMAT,
+                )}`,
+            )
+        }
+
+        end = end.maxOrCurrent()
+
         while (!end.isBusinessTime()) {
             end = end.subtract(this.precision)
         }
@@ -340,7 +436,12 @@ export class BusinessTime {
             .unix(flooredUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentFloored, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentFloored,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -368,7 +469,12 @@ export class BusinessTime {
             .unix(roundedUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentRounded, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentRounded,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -396,7 +502,12 @@ export class BusinessTime {
             .unix(ceiledUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentCeiled, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentCeiled,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     lengthOfBusinessDay(): moment.Duration {
@@ -483,7 +594,12 @@ export class BusinessTime {
     }
 
     atMoment(time: moment.Moment): BusinessTime {
-        return new BusinessTime(time, this.precision.clone(), this.constraints, this.typicalDay)
+        return new BusinessTime(
+            time,
+            this.precision.clone(),
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     getMoment(): moment.Moment {
@@ -499,15 +615,68 @@ export class BusinessTime {
     }
 
     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     withTypicalDay(typicalDay: moment.Moment): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, this.constraints, typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            this.constraints,
+            typicalDay,
+        )
     }
 
     withPrecision(precision: moment.Duration): BusinessTime {
-        return new BusinessTime(this.getMoment(), precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            precision,
+            this.constraints,
+            this.typicalDay,
+        )
+    }
+
+    private humanReadableDateTime(): string {
+        return this.getMoment().format(HUMAN_READABLE_FORMAT)
+    }
+
+    private minOrCurrent(): BusinessTime {
+        const min = this.minMoment()
+        if (min && min.isAfter(this.getMoment())) {
+            return this.atMoment(min)
+        }
+
+        return this.clone()
+    }
+
+    private maxOrCurrent(): BusinessTime {
+        const max = this.maxMoment()
+        if (max && max.isBefore(this.getMoment())) {
+            return this.atMoment(max)
+        }
+
+        return this.clone()
+    }
+
+    private minMoment(): moment.Moment | null {
+        const minDates: moment.Moment[] = this.constraints
+            .map((constraint) => constraint.min())
+            .filter((min) => min) as moment.Moment[]
+
+        return minDates.length > 0 ? moment.min(...minDates) : null
+    }
+
+    private maxMoment(): moment.Moment | null {
+        const maxDates: moment.Moment[] = this.constraints
+            .map((constraint) => constraint.max())
+            .filter((max) => max) as moment.Moment[]
+
+        return maxDates.length > 0 ? moment.max(...maxDates) : null
     }
 
     private determineLengthOfBusinessDay(
@@ -526,7 +695,10 @@ export class BusinessTime {
             )
         }
 
+        // Ensure we are within min and max
         const typicalBusinessDay = this.atMoment(typicalDay)
+            .minOrCurrent()
+            .maxOrCurrent()
 
         const startOfBusinessDay = typicalBusinessDay
             .startOfBusinessDay()

@@ -8,6 +8,8 @@ import { NotConstraint } from "./NotConstraint"
 export abstract class CombinatorialConstraint
     implements ICombinatorialConstraint {
     abstract isBusinessTime(time: moment.Moment): boolean
+    abstract min(): null | moment.Moment
+    abstract max(): null | moment.Moment
 
     andAlso(
         ...additional: IBusinessTimeConstraint[]

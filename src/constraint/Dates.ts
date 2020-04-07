@@ -1,3 +1,4 @@
+import moment from "moment"
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { FormatConstraint } from "./FormatConstraint"
 
@@ -12,5 +13,12 @@ import { FormatConstraint } from "./FormatConstraint"
 export class Dates extends FormatConstraint implements IBusinessTimeConstraint {
     constructor(...dates: string[]) {
         super("YYYY-MM-DD", dates)
+    }
+    min(): null | moment.Moment {
+        return moment.min(...this.momentMatches)
+    }
+
+    max(): null | moment.Moment {
+        return moment.max(...this.momentMatches)
     }
 }

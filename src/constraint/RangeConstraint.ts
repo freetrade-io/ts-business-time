@@ -7,19 +7,27 @@ import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
 export abstract class RangeConstraint extends CombinatorialConstraint
     implements IBusinessTimeConstraint, IBusinessTimeNarrator {
     protected constructor(
-        private readonly min: number,
-        private readonly max: number,
+        private readonly pMin: number,
+        private readonly pMax: number,
     ) {
         super()
 
         // Keep the min and max within the valid range.
-        this.min = Math.max(min, this.minMin())
-        this.max = Math.min(max, this.maxMax())
+        this.pMin = Math.max(pMin, this.minMin())
+        this.pMax = Math.min(pMax, this.maxMax())
 
         // Allow backwards order.
-        if (this.min > this.max) {
-            [this.min, this.max] = [this.max, this.min]
+        if (this.pMin > this.pMax) {
+            [this.pMin, this.pMax] = [this.pMax, this.pMin]
         }
+    }
+
+    min(): null | moment.Moment {
+        return null
+    }
+
+    max(): null | moment.Moment {
+        return null
     }
 
     /**
@@ -42,8 +50,8 @@ export abstract class RangeConstraint extends CombinatorialConstraint
      */
     isBusinessTime(time: moment.Moment): boolean {
         return (
-            this.relevantValueOf(time) >= this.min &&
-            this.relevantValueOf(time) <= this.max
+            this.relevantValueOf(time) >= this.pMin &&
+            this.relevantValueOf(time) <= this.pMax
         )
     }
 
