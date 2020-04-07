@@ -20,4 +20,11 @@ export class Weekends extends FormatConstraint
 
         return DefaultNarration.BUSINESS_TIME
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

@@ -20,4 +20,11 @@ export class WeekDays extends FormatConstraint
 
         return "the weekend"
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

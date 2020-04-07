@@ -36,4 +36,11 @@ export class HoursOfDay extends FormatConstraint {
     constructor(...hoursOfDay: HourOfDay[]) {
         super("HH", hoursOfDay)
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

@@ -124,10 +124,14 @@ describe("getting the length of a business day", () => {
 
     test("determine length of business day when typicalDay is provided", () => {
         // When a typicalDay is set
-        const businessTime = new BusinessTime(moment.utc("2020-04-03T13:50:18.475Z")).withConstraints(
-            new BetweenHoursOfDay("09", "21"),
-            new Dates("2020-04-02", "2020-04-03", "2020-04-06"),
-        ).withTypicalDay(moment.utc("2020-04-02T01:00:00.000Z"))
+        const businessTime = new BusinessTime(
+            moment.utc("2020-04-03T13:50:18.475Z"),
+        )
+            .withConstraints(
+                new BetweenHoursOfDay("09", "21"),
+                new Dates("2020-04-02", "2020-04-03", "2020-04-06"),
+            )
+            .withTypicalDay(moment.utc("2020-04-02T01:00:00.000Z"))
 
         // Then the expected length of business day is expected
         const length: moment.Duration = businessTime.lengthOfBusinessDay()

@@ -12,13 +12,15 @@ import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
  *
  * https://momentjs.com/docs/#/displaying/format/
  */
-export class FormatConstraint extends CombinatorialConstraint
+export abstract class FormatConstraint extends CombinatorialConstraint
     implements IBusinessTimeConstraint, IBusinessTimeNarrator {
+    protected momentMatches: moment.Moment[]
     constructor(
         private readonly format: string,
         private readonly matches: string[],
     ) {
         super()
+        this.momentMatches = matches.map((m) => moment(m, format))
     }
 
     isBusinessTime(time: moment.Moment): boolean {

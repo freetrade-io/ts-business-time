@@ -5,4 +5,11 @@ export class Never implements IBusinessTimeConstraint {
     isBusinessTime(time: moment.Moment): boolean {
         return false
     }
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
 }

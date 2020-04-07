@@ -1,5 +1,6 @@
 import moment = require("moment-timezone")
-import { BusinessTime } from "../../../src"
+import { BetweenHoursOfDay, BusinessTime, Dates } from "../../../src"
+import { BusinessTimeError } from "../../../src/BusinessTimeError"
 import { TEST_FORMAT } from "../../index"
 
 describe("adding business days", () => {
@@ -77,6 +78,65 @@ describe("adding business days", () => {
 
             // Then we should get the expected new time.
             expect(added.format(TEST_FORMAT)).toBe(expectedNewTime)
+        },
+    )
+
+    test("specific dates are allowed and we can get the next business day", () => {
+        // Given April 2nd
+        const now = moment.utc("2020-04-02")
+
+        // With specific days
+        const businessTime = new BusinessTime(now).withConstraints(
+            new BetweenHoursOfDay("00", "23"),
+            new Dates(
+                "2020-03-31",
+                "2020-04-01",
+                "2020-04-02",
+                "2020-04-03",
+                "2020-04-06",
+                "2020-04-07",
+                "2020-04-08",
+                "2020-04-09",
+                "2020-04-14",
+                "2020-04-15",
+            ),
+        )
+
+        // When we add one business day
+        const result = businessTime.addBusinessDays(1)
+
+        // We get the next avaliable day
+        expect(result.getMoment().format("YYYY-MM-DD")).toEqual("2020-04-03")
+    })
+
+    test.each([
+        ["before", "2020-03-30", false],
+        ["after", "2020-04-03", true],
+    ])(
+        "should throw: $3 if we try to add business hours %1 the last avaliable date",
+        (when, nowString, throws) => {
+            // Given April 2nd
+            const now = moment.utc(nowString)
+
+            // With specific days
+            const businessTime = new BusinessTime(now).withConstraints(
+                new BetweenHoursOfDay("00", "23"),
+                new Dates(
+                    "2020-03-31",
+                    "2020-04-01",
+                    "2020-04-02",
+                    "2020-04-03",
+                ),
+            )
+
+            // When we add one business day
+            const expectation = expect(() => businessTime.addBusinessDays(1))
+
+            if (throws) {
+                expectation.toThrowError(BusinessTimeError)
+            } else {
+                expectation.not.toThrowError(BusinessTimeError)
+            }
         },
     )
 })

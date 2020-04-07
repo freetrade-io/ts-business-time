@@ -4,6 +4,16 @@ import { FormatConstraint } from "../../../../src/constraint/FormatConstraint"
 import { DefaultNarration } from "../../../../src/constraint/narration/DefaultNarration"
 import { TEST_FORMAT } from "../../../index"
 
+class StubFormatConstraint extends FormatConstraint {
+    min() {
+        return null
+    }
+
+    max() {
+        return null
+    }
+}
+
 describe("the default narration decorator", () => {
     /**
      * When the decorated constraint implements the narrator interface, then
@@ -11,7 +21,7 @@ describe("the default narration decorator", () => {
      */
     test("uses narrator implementation", () => {
         // Given we have a constraint with narration;
-        const constraint = new FormatConstraint("dddd", [])
+        const constraint = new StubFormatConstraint("dddd", [])
 
         // And we decorate it with a default narrator;
         const decorated = new DefaultNarration(constraint)
@@ -35,10 +45,13 @@ describe("the default narration decorator", () => {
         ["Wednesday 2018-05-23 13:00", "Wednesday 23rd May 2018 13:00"],
     ])("offers default", (givenTime: string, expectedNarration: string) => {
         // Given we have a constraint without narration;
+        // tslint:disable-next-line
         class NonNarratorConstraint implements IBusinessTimeConstraint {
             isBusinessTime(time: moment.Moment): boolean {
                 return false
             }
+            min = () => null
+            max = () => null
         }
         const constraint = new NonNarratorConstraint()
 
