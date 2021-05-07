@@ -1,7 +1,6 @@
 import moment = require("moment-timezone")
 import { IBusinessTimeConstraint } from "../BusinessTimeConstraint"
-import { AllConstraints } from "./AllConstraints"
-import { AnyConstraint } from "./AnyConstraint"
+import { AnyConstraint, AllConstraints } from "./AllConstraints"
 import { ICombinatorialConstraint } from "./ICombinatorialConstraint"
 import { NotConstraint } from "./NotConstraint"
 

@@ -1,5 +1,5 @@
 import { IBusinessTimeConstraint } from "../../../../src/constraint/BusinessTimeConstraint"
-import { AnyConstraint } from "../../../../src/constraint/composite/AnyConstraint"
+import { AnyConstraint } from "../../../../src/constraint/composite/AllConstraints"
 import {
     allMatchingWednesdayOnePm,
     noneMatchingWednesdayOnePm,
