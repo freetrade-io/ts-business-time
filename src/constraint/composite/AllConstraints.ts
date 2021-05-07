@@ -1,13 +1,15 @@
 import moment = require("moment-timezone")
 import { IBusinessTimeConstraint } from "../BusinessTimeConstraint"
-import { AnyConstraint } from "./AnyConstraint"
 import { ICombinatorialConstraint } from "./ICombinatorialConstraint"
 import { NotConstraint } from "./NotConstraint"
 
 export class AllConstraints implements ICombinatorialConstraint {
     private readonly constraints: IBusinessTimeConstraint[]
 
-    constructor(...constraints: IBusinessTimeConstraint[]) {
+    constructor(
+        private readonly anyConstraintClass: any,
+        ...constraints: IBusinessTimeConstraint[]
+    ) {
         this.constraints = constraints
     }
 
@@ -36,7 +38,7 @@ export class AllConstraints implements ICombinatorialConstraint {
     orAlternatively(
         ...alternatives: IBusinessTimeConstraint[]
     ): ICombinatorialConstraint {
-        return new AnyConstraint(this, ...alternatives)
+        return new this.anyConstraintClass(this, ...alternatives)
     }
 
     exceptFor(

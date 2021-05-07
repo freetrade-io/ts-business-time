@@ -2,6 +2,7 @@ import moment = require("moment-timezone")
 import { BusinessTime } from "../BusinessTime"
 import { IBusinessTimeConstraint } from "../constraint/BusinessTimeConstraint"
 import { AllConstraints } from "../constraint/composite/AllConstraints"
+import { AnyConstraint } from "../constraint"
 
 /**
  * A recurring cut-off point in time. For example, orders might be shipped at
@@ -11,7 +12,10 @@ export class RecurringDeadline {
     private readonly deadlineConstraints: IBusinessTimeConstraint
 
     constructor(...deadlineConstraints: IBusinessTimeConstraint[]) {
-        this.deadlineConstraints = new AllConstraints(...deadlineConstraints)
+        this.deadlineConstraints = new AllConstraints(
+            AnyConstraint,
+            ...deadlineConstraints,
+        )
     }
 
     /**

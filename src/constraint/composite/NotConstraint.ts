@@ -29,18 +29,22 @@ export class NotConstraint implements ICombinatorialConstraint {
     andAlso(
         ...additional: IBusinessTimeConstraint[]
     ): ICombinatorialConstraint {
-        return new AllConstraints(this, ...additional)
+        return new AllConstraints(AnyConstraint, this, ...additional)
     }
 
     orAlternatively(
         ...alternatives: IBusinessTimeConstraint[]
     ): ICombinatorialConstraint {
-        return new AnyConstraint(this, ...alternatives)
+        return new AnyConstraint(AllConstraints, this, ...alternatives)
     }
 
     exceptFor(
         ...exceptions: IBusinessTimeConstraint[]
     ): ICombinatorialConstraint {
-        return new AllConstraints(this, new NotConstraint(...exceptions))
+        return new AllConstraints(
+            AnyConstraint,
+            this,
+            new NotConstraint(...exceptions),
+        )
     }
 }
