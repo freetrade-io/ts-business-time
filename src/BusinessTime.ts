@@ -68,12 +68,23 @@ export class BusinessTime {
         const daysToJump: number = Math.floor(businessDaysToAdd)
         let next: BusinessTime = this.add(daysToJump, "days")
 
+        let currentNext = next.format('YYYY-MM-DD')
+        console.log(`Current next after jumpAhead: ${currentNext}`)
+
         // We need to check how much business time we actually covered by
         // skipping ahead in days.
-        businessDaysToAdd -= this.diffInPartialBusinessDays(next.getMoment())
+
+        let businessDayToSubstruct = this.diffInPartialBusinessDays(next.getMoment())
+
+        console.log(`Business days to substruct ${businessDayToSubstruct}`)
+        businessDaysToAdd -= businessDayToSubstruct
+
+        console.log(`Business days to add ${businessDaysToAdd}`)
 
         const decrement: number =
             this.precision.asDays() / this.lengthOfBusinessDay().asDays()
+
+        console.log(`Decrement ${decrement}`)
 
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
@@ -81,6 +92,9 @@ export class BusinessTime {
             }
             next = next.add(this.precision)
         }
+
+        currentNext = next.format('YYYY-MM-DD')
+        console.log(`Current next returning: ${currentNext}`)
 
         return next
     }
@@ -187,11 +201,14 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): number {
-        return (
-            this.diffInBusinessTime(time, absolute) /
-            (this.lengthOfBusinessDay().asSeconds() /
-                this.precision.asSeconds())
-        )
+        const anotherDay = this.lengthOfBusinessDay().asSeconds() /
+        this.precision.asSeconds()
+
+        console.log(`Another day: ${anotherDay}`)
+
+        const diffInBusinessTime = this.diffInBusinessTime(time, absolute) / anotherDay
+        console.log(`Diff in Business time: ${diffInBusinessTime}`)
+        return diffInBusinessTime
     }
 
     /**
@@ -229,6 +246,12 @@ export class BusinessTime {
             time = moment()
         }
 
+        // function momentToStr(m: moment.Moment) {
+        //     return m.format('YYYY-MM-DD')
+        // }
+
+        // console.log(`this.moment is: ${momentToStr(this.moment)} and the end moment is: ${momentToStr(time)}`)
+
         if (!time.isValid()) {
             throw new Error("Invalid time passed for diff")
         }
@@ -247,6 +270,7 @@ export class BusinessTime {
             end = this.moment
             // We only need to negate if absolute is false.
             sign = absolute ? 1 : -1
+            console.log('We swapped times')
         }
 
         // Count the business time diff by iterating in steps the length of the
@@ -428,8 +452,27 @@ export class BusinessTime {
         return this.moment.format(format)
     }
 
-    add(amount?: DurationInputArg1, unit?: DurationInputArg2): BusinessTime {
-        return this.atMoment(this.moment.clone().add(amount, unit))
+    add(amount?: DurationInputArg1, unit?: DurationInputArg2, testFlag?: boolean): BusinessTime {
+        const clonedMoment = this.moment.clone()
+
+        if (testFlag) {
+            console.log(`clonedMoment is: ${clonedMoment}`)
+        }
+
+        const addedMoment = clonedMoment.add(amount, unit)
+
+        if (testFlag) {
+            console.log(`addedMoment is: ${addedMoment}`)
+        }
+
+        const atMoment = this.atMoment(addedMoment)
+
+        if (testFlag) {
+            console.log(`atMoment is: ${atMoment.moment}`)
+        }
+
+
+        return atMoment//this.atMoment(this.moment.clone().add(amount, unit))
     }
 
     subtract(
