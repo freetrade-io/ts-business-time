@@ -75,48 +75,29 @@ export class BusinessTime {
             return this.subtractBusinessDays(Math.abs(businessDaysToAdd))
         }
 
-        console.log(`Current time is: ${this.moment}`)
-
         // Jump ahead in whole days first, because the business days to add
         // will be at least this much. This solves the "intuitive problem" that
         // Monday 09:00 + 1 business day could technically be Monday 17:00, but
         // intuitively should be Tuesday 09:00.
         const daysToJump: number = Math.floor(businessDaysToAdd)
-        console.log(`Before jumping ahead`)
         let currentStep = 0
         let next: BusinessTime = this.clone()
         while (daysToJump > currentStep) {
             next = next.add(1, "days")
-            console.log(`Added one day: ${next.getMoment()}`)
             if (next.isBusinessDay()) {
                 currentStep++
-                console.log(`Incrimented current step to ${currentStep}`)
             }
         }
 
-        let currentNext = next.format('YYYY-MM-DD')
-        console.log(`Current next after jumpAhead: ${currentNext}`)
-
         // We need to check how much business time we actually covered by
         // skipping ahead in days.
-
         let businessDayToSubstruct = this.diffInPartialBusinessDays(next.getMoment())
-
-        console.log(`Business days to substruct ${businessDayToSubstruct}`)
         businessDaysToAdd -= businessDayToSubstruct
-
-        console.log(`Business days to add ${businessDaysToAdd}`)
 
         const lengthOfBusinessDayAsDays = this.lengthOfBusinessDay().asDays()
         const precisionAsDays = this.precision.asDays()
 
         const decrement: number = precisionAsDays / lengthOfBusinessDayAsDays
-
-        console.log(`
-            Decrement: ${decrement}, 
-            LengthOfBusinessDaysAsDays: ${lengthOfBusinessDayAsDays}, 
-            precisionAsDays: ${precisionAsDays}
-        `)
 
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
@@ -124,9 +105,6 @@ export class BusinessTime {
             }
             next = next.add(this.precision)
         }
-
-        currentNext = next.format('YYYY-MM-DD')
-        console.log(`Current next returning: ${currentNext}`)
 
         return next
     }
@@ -233,13 +211,7 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): number {
-        const businessDayParts = this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds()
-
-        console.log(`businessDayParts: ${businessDayParts}`)
-
-        const diffInBusinessTime = this.diffInBusinessTime(time, absolute) 
-        console.log(`Diff in Business time: ${diffInBusinessTime}`)
-        return diffInBusinessTime / businessDayParts
+        return this.diffInBusinessTime(time, absolute) / (this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds())
     }
 
     /**
@@ -277,12 +249,6 @@ export class BusinessTime {
             time = moment()
         }
 
-        // function momentToStr(m: moment.Moment) {
-        //     return m.format('YYYY-MM-DD')
-        // }
-
-        // console.log(`this.moment is: ${momentToStr(this.moment)} and the end moment is: ${momentToStr(time)}`)
-
         if (!time.isValid()) {
             throw new Error("Invalid time passed for diff")
         }
@@ -313,10 +279,7 @@ export class BusinessTime {
                 diff += 1
             }
             next = next.add(this.precision)
-            // console.log(`Next is now: ${next.moment}`)
         }
-
-        console.log(`Diff is ${diff}`)
 
         return diff * sign
     }
@@ -486,27 +449,8 @@ export class BusinessTime {
         return this.moment.format(format)
     }
 
-    add(amount?: DurationInputArg1, unit?: DurationInputArg2, testFlag?: boolean): BusinessTime {
-        const clonedMoment = this.moment.clone()
-
-        if (testFlag) {
-            console.log(`clonedMoment is: ${clonedMoment}`)
-        }
-
-        const addedMoment = clonedMoment.add(amount, unit)
-
-        if (testFlag) {
-            console.log(`addedMoment is: ${addedMoment}`)
-        }
-
-        const atMoment = this.atMoment(addedMoment)
-
-        if (testFlag) {
-            console.log(`atMoment is: ${atMoment.moment}`)
-        }
-
-
-        return atMoment//this.atMoment(this.moment.clone().add(amount, unit))
+    add(amount?: DurationInputArg1, unit?: DurationInputArg2): BusinessTime {
+        return this.atMoment(this.moment.clone().add(amount, unit))
     }
 
     subtract(

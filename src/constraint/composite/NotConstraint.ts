@@ -25,7 +25,7 @@ export class NotConstraint
 
     isBusinessDay(): boolean {
         for (const constraint of this.constraints) {
-            if (isIBusinessDayStatic(constraint)) {
+            if (!isIBusinessDayStatic(constraint)) {
                 return false
             }
         }

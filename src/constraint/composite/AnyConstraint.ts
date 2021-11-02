@@ -24,11 +24,11 @@ export class AnyConstraint implements ICombinatorialConstraint,
 
     isBusinessDay(): boolean {
         for (const constraint of this.constraints) {
-            if (isIBusinessDayStatic(constraint)) {
-                return true
+            if (!isIBusinessDayStatic(constraint)) {
+                return false
             }
         }
-        return false
+        return true
     }
 
     /**
