@@ -8,7 +8,7 @@ import {
 } from "moment-timezone"
 import { AnyTime } from "./constraint/AnyTime"
 import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
-import { IBusinessTimeConstraint } from "./constraint/BusinessTimeConstraint"
+import { IBusinessTimeConstraint, isIBusinessDayStatic } from "./constraint/BusinessTimeConstraint"
 import { DefaultNarration } from "./constraint/narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
 import { WeekDays } from "./constraint/WeekDays"
@@ -48,6 +48,20 @@ export class BusinessTime {
         return true
     }
 
+    isBusinessDay(): boolean {
+        for (const constraint of this.constraints) {
+            // check if the constraints is a BusinessDayConstraint
+            if (isIBusinessDayStatic(constraint)) {
+                // check if the constraint is met
+                if (!constraint.isBusinessTime(this.getMoment())) {
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
     addBusinessDay(): BusinessTime {
         return this.addBusinessDays(1)
     }
@@ -61,12 +75,24 @@ export class BusinessTime {
             return this.subtractBusinessDays(Math.abs(businessDaysToAdd))
         }
 
+        console.log(`Current time is: ${this.moment}`)
+
         // Jump ahead in whole days first, because the business days to add
         // will be at least this much. This solves the "intuitive problem" that
         // Monday 09:00 + 1 business day could technically be Monday 17:00, but
         // intuitively should be Tuesday 09:00.
         const daysToJump: number = Math.floor(businessDaysToAdd)
-        let next: BusinessTime = this.add(daysToJump, "days")
+        console.log(`Before jumping ahead`)
+        let currentStep = 0
+        let next: BusinessTime = this.clone()
+        while (daysToJump > currentStep) {
+            next = next.add(1, "days")
+            console.log(`Added one day: ${next.getMoment()}`)
+            if (next.isBusinessDay()) {
+                currentStep++
+                console.log(`Incrimented current step to ${currentStep}`)
+            }
+        }
 
         let currentNext = next.format('YYYY-MM-DD')
         console.log(`Current next after jumpAhead: ${currentNext}`)
@@ -81,10 +107,16 @@ export class BusinessTime {
 
         console.log(`Business days to add ${businessDaysToAdd}`)
 
-        const decrement: number =
-            this.precision.asDays() / this.lengthOfBusinessDay().asDays()
+        const lengthOfBusinessDayAsDays = this.lengthOfBusinessDay().asDays()
+        const precisionAsDays = this.precision.asDays()
 
-        console.log(`Decrement ${decrement}`)
+        const decrement: number = precisionAsDays / lengthOfBusinessDayAsDays
+
+        console.log(`
+            Decrement: ${decrement}, 
+            LengthOfBusinessDaysAsDays: ${lengthOfBusinessDayAsDays}, 
+            precisionAsDays: ${precisionAsDays}
+        `)
 
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
@@ -201,14 +233,13 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): number {
-        const anotherDay = this.lengthOfBusinessDay().asSeconds() /
-        this.precision.asSeconds()
+        const businessDayParts = this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds()
 
-        console.log(`Another day: ${anotherDay}`)
+        console.log(`businessDayParts: ${businessDayParts}`)
 
-        const diffInBusinessTime = this.diffInBusinessTime(time, absolute) / anotherDay
+        const diffInBusinessTime = this.diffInBusinessTime(time, absolute) 
         console.log(`Diff in Business time: ${diffInBusinessTime}`)
-        return diffInBusinessTime
+        return diffInBusinessTime / businessDayParts
     }
 
     /**
@@ -282,7 +313,10 @@ export class BusinessTime {
                 diff += 1
             }
             next = next.add(this.precision)
+            // console.log(`Next is now: ${next.moment}`)
         }
+
+        console.log(`Diff is ${diff}`)
 
         return diff * sign
     }

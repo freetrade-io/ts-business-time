@@ -1,10 +1,11 @@
 import moment = require("moment-timezone")
-import { IBusinessTimeConstraint } from "../BusinessTimeConstraint"
+import { IBusinessTimeConstraint, IBusinessDayConstraint, isIBusinessDayStatic } from "../BusinessTimeConstraint"
 import { AllConstraints } from "./AllConstraints"
 import { ICombinatorialConstraint } from "./ICombinatorialConstraint"
 import { NotConstraint } from "./NotConstraint"
 
-export class AnyConstraint implements ICombinatorialConstraint {
+export class AnyConstraint implements ICombinatorialConstraint,
+    IBusinessDayConstraint {
     private readonly constraints: IBusinessTimeConstraint[]
 
     constructor(...constraints: IBusinessTimeConstraint[]) {
@@ -18,6 +19,15 @@ export class AnyConstraint implements ICombinatorialConstraint {
             }
         }
 
+        return false
+    }
+
+    isBusinessDay(): boolean {
+        for (const constraint of this.constraints) {
+            if (isIBusinessDayStatic(constraint)) {
+                return true
+            }
+        }
         return false
     }
 

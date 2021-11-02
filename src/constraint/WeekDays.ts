@@ -1,13 +1,20 @@
 import moment = require("moment-timezone")
+import { IBusinessDayConstraint } from "."
 import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
 import { FormatConstraint } from "./FormatConstraint"
 import { DefaultNarration } from "./narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
 
 export class WeekDays extends FormatConstraint
-    implements IBusinessTimeConstraint, IBusinessTimeNarrator {
+    implements IBusinessTimeConstraint, 
+        IBusinessTimeNarrator,
+        IBusinessDayConstraint {
     constructor() {
         super("dddd", ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
+    }
+
+    isBusinessDay(): boolean {
+        return true
     }
 
     /**
