@@ -8,7 +8,12 @@ export interface IBusinessDayConstraint {
     isBusinessDay(): boolean
 }
 
-export function isIBusinessDayStatic(object: unknown): object is IBusinessDayConstraint {
-    const businessDayConstraint = (object as IBusinessDayConstraint)
-    return businessDayConstraint.isBusinessDay !== undefined && businessDayConstraint.isBusinessDay()
+export function isIBusinessDayStatic(
+    object: unknown,
+): object is IBusinessDayConstraint {
+    const businessDayConstraint = object as IBusinessDayConstraint
+    return (
+        businessDayConstraint.isBusinessDay !== undefined &&
+        businessDayConstraint.isBusinessDay()
+    )
 }

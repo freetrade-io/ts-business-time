@@ -8,7 +8,10 @@ import {
 } from "moment-timezone"
 import { AnyTime } from "./constraint/AnyTime"
 import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
-import { IBusinessTimeConstraint, isIBusinessDayStatic } from "./constraint/BusinessTimeConstraint"
+import {
+    IBusinessTimeConstraint,
+    isIBusinessDayStatic,
+} from "./constraint/BusinessTimeConstraint"
 import { DefaultNarration } from "./constraint/narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
 import { WeekDays } from "./constraint/WeekDays"
@@ -91,13 +94,10 @@ export class BusinessTime {
 
         // We need to check how much business time we actually covered by
         // skipping ahead in days.
-        let businessDayToSubstruct = this.diffInPartialBusinessDays(next.getMoment())
-        businessDaysToAdd -= businessDayToSubstruct
+        businessDaysToAdd -= this.diffInPartialBusinessDays(next.getMoment())
 
-        const lengthOfBusinessDayAsDays = this.lengthOfBusinessDay().asDays()
-        const precisionAsDays = this.precision.asDays()
-
-        const decrement: number = precisionAsDays / lengthOfBusinessDayAsDays
+        const decrement: number =
+            this.precision.asDays() / this.lengthOfBusinessDay().asDays()
 
         while (businessDaysToAdd > 0) {
             if (next.isBusinessTime()) {
@@ -211,7 +211,11 @@ export class BusinessTime {
         time?: moment.Moment,
         absolute: boolean = true,
     ): number {
-        return this.diffInBusinessTime(time, absolute) / (this.lengthOfBusinessDay().asSeconds() / this.precision.asSeconds())
+        return (
+            this.diffInBusinessTime(time, absolute) /
+            (this.lengthOfBusinessDay().asSeconds() /
+                this.precision.asSeconds())
+        )
     }
 
     /**
@@ -267,7 +271,6 @@ export class BusinessTime {
             end = this.moment
             // We only need to negate if absolute is false.
             sign = absolute ? 1 : -1
-            console.log('We swapped times')
         }
 
         // Count the business time diff by iterating in steps the length of the
@@ -303,7 +306,12 @@ export class BusinessTime {
     withBusinessTimeConstraints(
         ...constraints: IBusinessTimeConstraint[]
     ): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     businessName(): string {
@@ -361,7 +369,12 @@ export class BusinessTime {
             .unix(flooredUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentFloored, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentFloored,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -389,7 +402,12 @@ export class BusinessTime {
             .unix(roundedUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentRounded, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentRounded,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -417,7 +435,12 @@ export class BusinessTime {
             .unix(ceiledUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentCeiled, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentCeiled,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     lengthOfBusinessDay(): moment.Duration {
@@ -504,7 +527,12 @@ export class BusinessTime {
     }
 
     atMoment(time: moment.Moment): BusinessTime {
-        return new BusinessTime(time, this.precision.clone(), this.constraints, this.typicalDay)
+        return new BusinessTime(
+            time,
+            this.precision.clone(),
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     getMoment(): moment.Moment {
@@ -520,15 +548,30 @@ export class BusinessTime {
     }
 
     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     withTypicalDay(typicalDay: moment.Moment): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, this.constraints, typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            this.constraints,
+            typicalDay,
+        )
     }
 
     withPrecision(precision: moment.Duration): BusinessTime {
-        return new BusinessTime(this.getMoment(), precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     private determineLengthOfBusinessDay(

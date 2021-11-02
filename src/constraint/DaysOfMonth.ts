@@ -14,13 +14,9 @@ export class DaysOfMonth extends FormatConstraint
     constructor(...daysOfMonth: DayOfMonth[]) {
         super(
             "D",
-            daysOfMonth.map(
-                (dayOfMonth: DayOfMonth): string => {
-                    return String(
-                        Number(String(dayOfMonth).replace(/[^0-9]/g, "")),
-                    )
-                },
-            ),
+            daysOfMonth.map((dayOfMonth: DayOfMonth): string => {
+                return String(Number(String(dayOfMonth).replace(/[^0-9]/g, "")))
+            }),
         )
     }
 }

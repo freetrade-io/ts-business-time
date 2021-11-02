@@ -6,7 +6,8 @@ import { DefaultNarration } from "./narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./narration/IBusinessTimeNarrator"
 
 export class WeekDays extends FormatConstraint
-    implements IBusinessTimeConstraint, 
+    implements
+        IBusinessTimeConstraint,
         IBusinessTimeNarrator,
         IBusinessDayConstraint {
     constructor() {

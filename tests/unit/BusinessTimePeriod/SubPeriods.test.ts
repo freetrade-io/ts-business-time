@@ -185,14 +185,12 @@ describe("sub-periods of a business time period", () => {
             const subPeriods = timePeriod.subPeriods()
 
             // Then their timings should be as expected;
-            const subPeriodTimings = subPeriods.map(
-                (subPeriod): string[] => {
-                    return [
-                        subPeriod.getStart().format("dddd HH:mm"),
-                        subPeriod.getEnd().format("dddd HH:mm"),
-                    ]
-                },
-            )
+            const subPeriodTimings = subPeriods.map((subPeriod): string[] => {
+                return [
+                    subPeriod.getStart().format("dddd HH:mm"),
+                    subPeriod.getEnd().format("dddd HH:mm"),
+                ]
+            })
             expect(subPeriodTimings).toEqual(expectedSubPeriodTimings)
         },
     )

@@ -1,5 +1,11 @@
 import moment = require("moment-timezone")
-import {BetweenHoursOfDay, BusinessTime, Dates, NotConstraint, WeekDays} from "../../../src"
+import {
+    BetweenHoursOfDay,
+    BusinessTime,
+    Dates,
+    NotConstraint,
+    WeekDays,
+} from "../../../src"
 import { TEST_FORMAT } from "../../index"
 
 describe("adding business days", () => {
@@ -55,7 +61,6 @@ describe("adding business days", () => {
         // From Friday morning
         ["Tuesday 2021-10-19 00:00", 2, "Thursday 2021-10-21 00:00"],
         ["Friday 2021-10-29 09:01", 1, "Monday 2021-11-01 09:01"],
-        ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
         ["Friday 2021-10-29 10:00", 1, "Monday 2021-11-01 10:00"],
         ["Friday 2021-10-29 04:00", 1, "Monday 2021-11-01 04:00"],
         ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
@@ -72,15 +77,14 @@ describe("adding business days", () => {
         ["Friday 2018-05-18 17:00", -1.5, "Thursday 2018-05-17 13:00"],
         ["Friday 2018-05-18 17:00", -1.75, "Thursday 2018-05-17 11:00"],
         ["Friday 2018-05-18 17:00", -2, "Wednesday 2018-05-16 17:00"],
-
     ])(
         "testAddBusinessDaysDefault",
         (time: string, businessDaysToAdd: number, expectedNewTime: string) => {
             // Given we have a business time for a specific time;
             const businessTime: BusinessTime = new BusinessTime(
-                moment.utc(time, TEST_FORMAT)
+                moment.utc(time, TEST_FORMAT),
             )
-            console.log('In test')
+            console.log("In test")
 
             // When we add an amount of business days to it;
             const added: BusinessTime = businessTime.addBusinessDays(
@@ -106,10 +110,10 @@ describe("adding business days", () => {
                 [
                     new WeekDays(),
                     new BetweenHoursOfDay("09", "17"),
-                    new NotConstraint(new Dates('2018-05-15', '2021-10-28')),
-                ]
+                    new NotConstraint(new Dates("2018-05-15", "2021-10-28")),
+                ],
             )
-            console.log('In test')
+            console.log("In test")
 
             // When we add an amount of business days to it;
             const added: BusinessTime = businessTime.addBusinessDays(
