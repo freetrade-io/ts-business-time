@@ -57,14 +57,12 @@ describe("adding business days", () => {
         ["Friday 2018-05-18 17:00", 1.75, "Tuesday 2018-05-22 15:00"],
         ["Friday 2018-05-18 17:00", 2, "Tuesday 2018-05-22 17:00"],
         ["Friday 2018-05-18 17:00", 3, "Wednesday 2018-05-23 17:00"],
-
         // From Friday morning
         ["Tuesday 2021-10-19 00:00", 2, "Thursday 2021-10-21 00:00"],
         ["Friday 2021-10-29 09:01", 1, "Monday 2021-11-01 09:01"],
         ["Friday 2021-10-29 10:00", 1, "Monday 2021-11-01 10:00"],
         ["Friday 2021-10-29 04:00", 1, "Monday 2021-11-01 04:00"],
         ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
-
         ["Friday 2021-10-22 00:00", 1, "Monday 2021-10-25 00:00"],
         // Negative values.
         ["Friday 2018-05-18 00:00", -0, "Friday 2018-05-18 00:00"],
@@ -84,7 +82,6 @@ describe("adding business days", () => {
             const businessTime: BusinessTime = new BusinessTime(
                 moment.utc(time, TEST_FORMAT),
             )
-            console.log("In test")
 
             // When we add an amount of business days to it;
             const added: BusinessTime = businessTime.addBusinessDays(
@@ -101,7 +98,7 @@ describe("adding business days", () => {
         ["Monday 2018-05-14 04:00", 1, "Wednesday 2018-05-16 04:00"],
         ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
     ])(
-        "test Add business when next day is a holiday",
+        "test Add business when next day is a holiday or a weekend",
         (time: string, businessDaysToAdd: number, expectedNewTime: string) => {
             // Given we have a business time for a specific time;
             const businessTime: BusinessTime = new BusinessTime(
@@ -113,8 +110,6 @@ describe("adding business days", () => {
                     new NotConstraint(new Dates("2018-05-15", "2021-10-28")),
                 ],
             )
-            console.log("In test")
-
             // When we add an amount of business days to it;
             const added: BusinessTime = businessTime.addBusinessDays(
                 businessDaysToAdd,

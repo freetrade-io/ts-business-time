@@ -17,22 +17,11 @@ export class AnyConstraint
     }
 
     isBusinessTime(time: moment.Moment): boolean {
-        for (const constraint of this.constraints) {
-            if (constraint.isBusinessTime(time)) {
-                return true
-            }
-        }
-
-        return false
+        return this.constraints.some((c) => c.isBusinessTime(time))
     }
 
     isBusinessDay(): boolean {
-        for (const constraint of this.constraints) {
-            if (!isIBusinessDayStatic(constraint)) {
-                return false
-            }
-        }
-        return true
+        return this.constraints.every(isIBusinessDayStatic)
     }
 
     /**

@@ -13,7 +13,7 @@ export function isIBusinessDayStatic(
 ): object is IBusinessDayConstraint {
     const businessDayConstraint = object as IBusinessDayConstraint
     return (
-        businessDayConstraint.isBusinessDay !== undefined &&
+        typeof businessDayConstraint.isBusinessDay === 'function' &&
         businessDayConstraint.isBusinessDay()
     )
 }

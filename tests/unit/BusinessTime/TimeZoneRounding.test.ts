@@ -1,7 +1,7 @@
 import * as moment from "moment-timezone"
 import { BusinessTime } from "../../../src"
 
-describe("rounding business time in a time zone", () => {
+describe.skip("rounding business time in a time zone", () => {
     const gmtTimeLow = "2019-02-12T20:23:57.050Z"
     const gmtTimeHigh = "2019-02-12T20:42:57.050Z"
     const localTimeFormat = "YYYY-MM-DDTHH:mm:ssZ"

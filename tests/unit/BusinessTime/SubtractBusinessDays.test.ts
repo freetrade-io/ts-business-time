@@ -16,6 +16,8 @@ describe("subtracting business days", () => {
         ["Monday 2018-05-21 13:00", "Friday 2018-05-18 13:00"],
         ["Sunday 2018-05-20 11:00", "Friday 2018-05-18 09:00"],
         ["Saturday 2018-05-19 10:00", "Friday 2018-05-18 09:00"],
+        ["Monday 2018-05-21 08:00", "Friday 2018-05-18 08:00"],
+        ["Monday 2018-05-21 00:00", "Friday 2018-05-18 00:00"],
     ])(
         "subtract business day default",
         (time: string, expectedNewTime: string) => {

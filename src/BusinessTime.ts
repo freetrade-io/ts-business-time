@@ -52,17 +52,22 @@ export class BusinessTime {
     }
 
     isBusinessDay(): boolean {
-        for (const constraint of this.constraints) {
-            // check if the constraints is a BusinessDayConstraint
-            if (isIBusinessDayStatic(constraint)) {
-                // check if the constraint is met
-                if (!constraint.isBusinessTime(this.getMoment())) {
-                    return false
-                }
-            }
-        }
+        /*
+            With this method one can identify if the given day is a business day
+            even if the actual time is out of time constraints
+            (e.g. 4.00 would be out of 9.00 to 17.00)
+            The day will be only considered as business day if
+            every constraint is either less granular than day(e.g. hour or minute)
+            or when the granularity is a day or more the result of
+            isBusinessTime method call is positive.
+        */
+        const currentMoment = this.getMoment()
+        const result: boolean = this.constraints.every((constraint) => {
+            return !isIBusinessDayStatic(constraint)
+                || constraint.isBusinessTime(currentMoment)
+        })
 
-        return true
+        return result
     }
 
     addBusinessDay(): BusinessTime {
@@ -127,7 +132,14 @@ export class BusinessTime {
         // problem" that Tuesday 17:00 - 1 business day could technically be
         // Tuesday 09:00, but intuitively should be Monday 17:00.
         const daysToJump: number = Math.floor(businessDaysToSub)
-        let prev: BusinessTime = this.subtract(daysToJump, "days")
+        let currentStep = 0
+        let prev: BusinessTime = this.clone()
+        while (daysToJump > currentStep) {
+            prev = prev.subtract(1, "days")
+            if (prev.isBusinessDay()) {
+                currentStep++
+            }
+        }
 
         // We need to check how much business time we actually covered by
         // skipping back in days.

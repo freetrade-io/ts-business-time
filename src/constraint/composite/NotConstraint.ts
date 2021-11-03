@@ -17,21 +17,11 @@ export class NotConstraint
     }
 
     isBusinessTime(time: moment.Moment): boolean {
-        for (const constraint of this.constraints) {
-            if (constraint.isBusinessTime(time)) {
-                return false
-            }
-        }
-        return true
+        return this.constraints.every((c) => !c.isBusinessTime(time))
     }
 
     isBusinessDay(): boolean {
-        for (const constraint of this.constraints) {
-            if (!isIBusinessDayStatic(constraint)) {
-                return false
-            }
-        }
-        return true
+        return this.constraints.every(isIBusinessDayStatic)
     }
 
     /**
