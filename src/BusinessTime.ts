@@ -10,7 +10,7 @@ import { AnyTime } from "./constraint/AnyTime"
 import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
 import {
     IBusinessTimeConstraint,
-    isIBusinessDayStatic,
+    isBusinessDayConstraint,
 } from "./constraint/BusinessTimeConstraint"
 import { DefaultNarration } from "./constraint/narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
@@ -63,8 +63,10 @@ export class BusinessTime {
         */
         const currentMoment = this.getMoment()
         const result: boolean = this.constraints.every((constraint) => {
-            return !isIBusinessDayStatic(constraint)
-                || constraint.isBusinessTime(currentMoment)
+            return (
+                !isBusinessDayConstraint(constraint) ||
+                constraint.isBusinessTime(currentMoment)
+            )
         })
 
         return result

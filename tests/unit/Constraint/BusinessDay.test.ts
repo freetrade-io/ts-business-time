@@ -24,7 +24,7 @@ describe("Checking BusinessTime", () => {
                 new NotConstraint(new Dates("2018-05-15")),
             ],
         )
-        
+
         // We check the business time is a business day
         const isBusinessDay = businessTime.isBusinessDay()
 

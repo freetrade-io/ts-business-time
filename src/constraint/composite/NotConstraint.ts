@@ -2,7 +2,7 @@ import moment = require("moment-timezone")
 import { IBusinessDayConstraint } from ".."
 import {
     IBusinessTimeConstraint,
-    isIBusinessDayStatic,
+    isBusinessDayConstraint,
 } from "../BusinessTimeConstraint"
 import { AllConstraints } from "./AllConstraints"
 import { AnyConstraint } from "./AnyConstraint"
@@ -21,7 +21,7 @@ export class NotConstraint
     }
 
     isBusinessDay(): boolean {
-        return this.constraints.every(isIBusinessDayStatic)
+        return this.constraints.every(isBusinessDayConstraint)
     }
 
     /**
