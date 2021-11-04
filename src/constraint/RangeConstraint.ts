@@ -18,7 +18,7 @@ export abstract class RangeConstraint extends CombinatorialConstraint
 
         // Allow backwards order.
         if (this.min > this.max) {
-            ;[this.min, this.max] = [this.max, this.min]
+            [this.min, this.max] = [this.max, this.min]
         }
     }
 
