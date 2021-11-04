@@ -1,4 +1,7 @@
-import { IBusinessTimeConstraint } from "./BusinessTimeConstraint"
+import {
+    IBusinessTimeConstraint,
+    IBusinessDayConstraint,
+} from "./BusinessTimeConstraint"
 import { FormatConstraint } from "./FormatConstraint"
 
 /**
@@ -9,8 +12,13 @@ import { FormatConstraint } from "./FormatConstraint"
  *
  * The format is YYYY-MM-DD
  */
-export class Dates extends FormatConstraint implements IBusinessTimeConstraint {
+export class Dates extends FormatConstraint
+    implements IBusinessTimeConstraint, IBusinessDayConstraint {
     constructor(...dates: string[]) {
         super("YYYY-MM-DD", dates)
+    }
+
+    isBusinessDay(): boolean {
+        return true
     }
 }

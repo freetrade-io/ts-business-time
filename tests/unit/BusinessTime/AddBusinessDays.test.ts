@@ -1,5 +1,11 @@
 import moment = require("moment-timezone")
-import { BusinessTime } from "../../../src"
+import {
+    BetweenHoursOfDay,
+    BusinessTime,
+    Dates,
+    NotConstraint,
+    WeekDays,
+} from "../../../src"
 import { TEST_FORMAT } from "../../index"
 
 describe("adding business days", () => {
@@ -51,6 +57,13 @@ describe("adding business days", () => {
         ["Friday 2018-05-18 17:00", 1.75, "Tuesday 2018-05-22 15:00"],
         ["Friday 2018-05-18 17:00", 2, "Tuesday 2018-05-22 17:00"],
         ["Friday 2018-05-18 17:00", 3, "Wednesday 2018-05-23 17:00"],
+        // From Friday morning
+        ["Tuesday 2021-10-19 00:00", 2, "Thursday 2021-10-21 00:00"],
+        ["Friday 2021-10-29 09:01", 1, "Monday 2021-11-01 09:01"],
+        ["Friday 2021-10-29 10:00", 1, "Monday 2021-11-01 10:00"],
+        ["Friday 2021-10-29 04:00", 1, "Monday 2021-11-01 04:00"],
+        ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
+        ["Friday 2021-10-22 00:00", 1, "Monday 2021-10-25 00:00"],
         // Negative values.
         ["Friday 2018-05-18 00:00", -0, "Friday 2018-05-18 00:00"],
         ["Friday 2018-05-18 17:00", -0, "Friday 2018-05-18 17:00"],
@@ -70,6 +83,33 @@ describe("adding business days", () => {
                 moment.utc(time, TEST_FORMAT),
             )
 
+            // When we add an amount of business days to it;
+            const added: BusinessTime = businessTime.addBusinessDays(
+                businessDaysToAdd,
+            )
+
+            // Then we should get the expected new time.
+            expect(added.format(TEST_FORMAT)).toBe(expectedNewTime)
+        },
+    )
+
+    test.each([
+        ["Wednesday 2021-10-27 04:00", 1, "Friday 2021-10-29 04:00"],
+        ["Monday 2018-05-14 04:00", 1, "Wednesday 2018-05-16 04:00"],
+        ["Friday 2021-10-29 00:00", 1, "Monday 2021-11-01 00:00"],
+    ])(
+        "test Add business when next day is a holiday or a weekend",
+        (time: string, businessDaysToAdd: number, expectedNewTime: string) => {
+            // Given we have a business time for a specific time;
+            const businessTime: BusinessTime = new BusinessTime(
+                moment.utc(time, TEST_FORMAT),
+                moment.duration(1, "hour"),
+                [
+                    new WeekDays(),
+                    new BetweenHoursOfDay("09", "17"),
+                    new NotConstraint(new Dates("2018-05-15", "2021-10-28")),
+                ],
+            )
             // When we add an amount of business days to it;
             const added: BusinessTime = businessTime.addBusinessDays(
                 businessDaysToAdd,

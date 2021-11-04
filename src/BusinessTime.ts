@@ -8,7 +8,10 @@ import {
 } from "moment-timezone"
 import { AnyTime } from "./constraint/AnyTime"
 import { BetweenHoursOfDay } from "./constraint/BetweenHoursOfDay"
-import { IBusinessTimeConstraint } from "./constraint/BusinessTimeConstraint"
+import {
+    IBusinessTimeConstraint,
+    isBusinessDayConstraint,
+} from "./constraint/BusinessTimeConstraint"
 import { DefaultNarration } from "./constraint/narration/DefaultNarration"
 import { IBusinessTimeNarrator } from "./constraint/narration/IBusinessTimeNarrator"
 import { WeekDays } from "./constraint/WeekDays"
@@ -48,6 +51,27 @@ export class BusinessTime {
         return true
     }
 
+    isBusinessDay(): boolean {
+        /*
+            With this method one can identify if the given day is a business day
+            even if the actual time is out of time constraints
+            (e.g. 4.00 would be out of 9.00 to 17.00)
+            The day will be only considered as business day if
+            every constraint is either less granular than day(e.g. hour or minute)
+            or when the granularity is a day or more the result of
+            isBusinessTime method call is positive.
+        */
+        const currentMoment = this.getMoment()
+        const result: boolean = this.constraints.every((constraint) => {
+            return (
+                !isBusinessDayConstraint(constraint) ||
+                constraint.isBusinessTime(currentMoment)
+            )
+        })
+
+        return result
+    }
+
     addBusinessDay(): BusinessTime {
         return this.addBusinessDays(1)
     }
@@ -66,7 +90,14 @@ export class BusinessTime {
         // Monday 09:00 + 1 business day could technically be Monday 17:00, but
         // intuitively should be Tuesday 09:00.
         const daysToJump: number = Math.floor(businessDaysToAdd)
-        let next: BusinessTime = this.add(daysToJump, "days")
+        let currentStep = 0
+        let next: BusinessTime = this.clone()
+        while (daysToJump > currentStep) {
+            next = next.add(1, "days")
+            if (next.isBusinessDay()) {
+                currentStep++
+            }
+        }
 
         // We need to check how much business time we actually covered by
         // skipping ahead in days.
@@ -103,7 +134,14 @@ export class BusinessTime {
         // problem" that Tuesday 17:00 - 1 business day could technically be
         // Tuesday 09:00, but intuitively should be Monday 17:00.
         const daysToJump: number = Math.floor(businessDaysToSub)
-        let prev: BusinessTime = this.subtract(daysToJump, "days")
+        let currentStep = 0
+        let prev: BusinessTime = this.clone()
+        while (daysToJump > currentStep) {
+            prev = prev.subtract(1, "days")
+            if (prev.isBusinessDay()) {
+                currentStep++
+            }
+        }
 
         // We need to check how much business time we actually covered by
         // skipping back in days.
@@ -282,7 +320,12 @@ export class BusinessTime {
     withBusinessTimeConstraints(
         ...constraints: IBusinessTimeConstraint[]
     ): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     businessName(): string {
@@ -340,7 +383,12 @@ export class BusinessTime {
             .unix(flooredUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentFloored, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentFloored,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -368,7 +416,12 @@ export class BusinessTime {
             .unix(roundedUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentRounded, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentRounded,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     /**
@@ -396,7 +449,12 @@ export class BusinessTime {
             .unix(ceiledUnix)
             .tz(this.moment.tz() || "UTC")
 
-        return new BusinessTime(momentCeiled, this.precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            momentCeiled,
+            this.precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     lengthOfBusinessDay(): moment.Duration {
@@ -483,7 +541,12 @@ export class BusinessTime {
     }
 
     atMoment(time: moment.Moment): BusinessTime {
-        return new BusinessTime(time, this.precision.clone(), this.constraints, this.typicalDay)
+        return new BusinessTime(
+            time,
+            this.precision.clone(),
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     getMoment(): moment.Moment {
@@ -499,15 +562,30 @@ export class BusinessTime {
     }
 
     withConstraints(...constraints: IBusinessTimeConstraint[]): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            constraints,
+            this.typicalDay,
+        )
     }
 
     withTypicalDay(typicalDay: moment.Moment): BusinessTime {
-        return new BusinessTime(this.getMoment(), this.precision, this.constraints, typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            this.precision,
+            this.constraints,
+            typicalDay,
+        )
     }
 
     withPrecision(precision: moment.Duration): BusinessTime {
-        return new BusinessTime(this.getMoment(), precision, this.constraints, this.typicalDay)
+        return new BusinessTime(
+            this.getMoment(),
+            precision,
+            this.constraints,
+            this.typicalDay,
+        )
     }
 
     private determineLengthOfBusinessDay(
